@@ -112,12 +112,12 @@ el desarrollo, los resultados y las conclusiones, puede ser consultado según el
 ## Ejemplo de RdA para Pruebas
 
 Puede utilizar los siguientes RdA para una prueba rápida dentro de la aplicación:
-*   "Identificar las partes de una célula."
-*   "El alumno comprenderá los principios de la termodinámica para aplicarlos en la resolución de problemas complejos de ingeniería."
-*   "Desarrollar un plan de negocios sostenible."
-*   "Analizar críticamente las teorías de la evolución para evaluar su impacto en la biología moderna."
-*   "Crear un proyecto de investigación que demuestre la aplicación de técnicas avanzadas de programación."
-*   "Aplicar técnicas de procesamiento de lenguaje natural para analizar textos académicos."
+*   Identificar las partes de una célula.
+*   El alumno comprenderá los principios de la termodinámica para aplicarlos en la resolución de problemas complejos de ingeniería.
+*   Desarrollar un plan de negocios sostenible.
+*   Analizar críticamente las teorías de la evolución para evaluar su impacto en la biología moderna.
+*   Crear un proyecto de investigación que demuestre la aplicación de técnicas avanzadas de programación.
+*   Aplicar técnicas de procesamiento de lenguaje natural para analizar textos académicos.
 
 ## Contribución y Contacto
 
