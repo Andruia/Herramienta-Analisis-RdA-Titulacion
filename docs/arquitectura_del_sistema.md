@@ -22,7 +22,7 @@ El sistema está compuesto por los siguientes módulos y componentes clave:
 *   **Módulos de Análisis Especializados (Backend - NLP):**
     *   Estos módulos contienen la lógica específica para evaluar el RdA según cada criterio. Utilizan bibliotecas de Procesamiento de Lenguaje Natural (NLP) como spaCy y NLTK.
     *   **Módulo de Análisis de Taxonomía de Anderson:**
-        *   **Archivo:** `src/bloom_analyzer.py` (o el nombre que le haya dado)
+        *   **Archivo:** `src/bloom_analyzer.py` 
         *   **Responsabilidad:** Identificar el nivel cognitivo del RdA según la Taxonomía de Bloom (revisada por Anderson y Krathwohl), basándose en los verbos y la estructura de la frase.
     *   **Módulo de Análisis de Verificabilidad:**
         *   **Archivo:** `src/verificability_analyzer.py`
@@ -35,14 +35,14 @@ El sistema está compuesto por los siguientes módulos y componentes clave:
         *   **Responsabilidad:** Evaluar la relevancia y adecuación contextual del RdA.
 
 *   **Bibliotecas de NLP y Recursos:**
-    *   **spaCy:** Utilizada para tokenización, lematización, análisis sintáctico, reconocimiento de entidades, y carga de modelos de lenguaje pre-entrenados (ej. `es_core_news_sm`).
+    *   **spaCy:** Utilizada para tokenización, lematización, análisis sintáctico, reconocimiento de entidades, y carga de modelos de lenguaje pre-entrenados (ej. modelo utilizando `es_core_news_sm`).
     *   **NLTK:** Utilizada para tareas complementarias de NLP, como acceso a corpus, tokenizadores específicos, etc.
-    *   **Diccionarios/Listas Personalizadas:** Archivos de datos internos (ej. listas de verbos de Bloom, palabras clave) utilizados por los analizadores, ubicados en `data/`.
+    *   **Diccionarios/Listas Personalizadas:** Archivos de datos internos (ej. listas de verbos de Bloom, palabras clave) utilizados por los analizadores, estan ubicados en `data/`.
 
 ## 2. Flujo de Datos y Proceso General
 
-1.  **Entrada del Usuario:** El usuario ingresa el texto de un Resultado de Aprendizaje en la interfaz web (Streamlit - `app.py`).
-2.  **Activación del Análisis:** El usuario acciona un botón (ej. "Analizar RdA").
+1.  **Entrada del Usuario:** El usuario ingresa el texto o archivo (.xlsx, .csv, .txt) de un/unos Resultado (s) de Aprendizaje en la interfaz web (Streamlit - `app.py`).
+2.  **Activación del Análisis:** El usuario acciona un botón (ej. "Analizar").
 3.  **Procesamiento en `app.py`:**
     *   La función controladora en `app.py` recibe el texto del RdA.
     *   Se invoca al `bloom_analyzer.py` con el texto del RdA.

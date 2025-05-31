@@ -12,7 +12,7 @@ de una aplicación web con Streamlit.
 
 **Universidad:** Universidad Hemisferios
 
-**Fecha:** Mayo 2025
+**Fecha:** 31 Mayo 2025
 
 ## Descripción General
 
@@ -48,9 +48,10 @@ el desarrollo, los resultados y las conclusiones, puede ser consultado según el
     *   `verificability_analyzer.py`: Módulo para el análisis de verificabilidad.
     *   `bloom_analyzer.py`: Módulo para el análisis según la Taxonomía de Anderson (2001).
     *   `[otros_modulos_o_utilidades.py]`: Cualquier otro script de apoyo o utilidades.
-*   `/data/` - Contiene archivos de entrada/salida usados en los análisis.  
+*   `/data/` - Contiene archivos internos: usados en los análisis de la taxonomia de Anderson (`bloom_taxonomy.json`) , 
+asi como listado de competencias profesionales para analisis autenticidad(`professional_keywords.json`).  
 *   `/docs/` - Documentación adicional sobre la arquitectura y funcionalidades.
-    *   `[diagrama_arquitectura.png]`: [Descripción].
+    *   `[diagrama_arquitectura.png]`: .
 
 ## Requisitos Previos
 
@@ -71,9 +72,9 @@ el desarrollo, los resultados y las conclusiones, puede ser consultado según el
     ```bash
     python -m venv venv
     # En Windows
-    .\venv_py312\Scripts\activate
+    .\venv\Scripts\activate
     # En macOS/Linux
-    source venv_py312/bin/activate
+    source venv/bin/activate
     ```
 
 3.  **Instalar las dependencias:**
@@ -84,7 +85,7 @@ el desarrollo, los resultados y las conclusiones, puede ser consultado según el
    
     ```bash
     python -m spacy download es_core_news_sm 
-    # ( modelo específico que se utilizó en la aplicación)
+    # ( Modelo específico que se utilizó en la aplicación)
     ```
 
 ## Uso de la Herramienta
@@ -121,11 +122,16 @@ Puede utilizar los siguientes RdA para una prueba rápida dentro de la aplicaci�
 *   Analizar críticamente las teorías de la evolución para evaluar su impacto en la biología moderna.
 *   Crear un proyecto de investigación que demuestre la aplicación de técnicas avanzadas de programación.
 *   Aplicar técnicas de procesamiento de lenguaje natural para analizar textos académicos.
-
+*   Evaluar la efectividad de diferentes métodos de enseñanza en el aprendizaje de matemáticas.
+*   Diseñar un experimento que permita observar el comportamiento de los gases ideales.
+*   **NOTA:** Pegue el RdA en el campo de texto de la aplicación, o cargue un archivo .xlsx con los RdA.
+*             Asegúrese de que el RdA esté redactado en español, ya que la aplicación está configurada para analizar textos en este idioma.
 ## Contribución y Contacto
 
 Este proyecto fue desarrollado por Rubén M. Tocaín G.
 
 Para cualquier consulta o sugerencia, puede contactar a rtocain@gmail.com
 ## 📢 Notas Finales
-Este proyecto es parte del trabajo de titulación de maestría, desarrollado con enfoque en inteligencia artificial aplicada a la educación. 
+Este proyecto es parte del Caso Práctico de Titulación de Maestría, 
+desarrollado con enfoque en inteligencia artificial aplicada a la educación y 
+forma parte de una colaboración en una investigación doctoral de la PUCESI. 

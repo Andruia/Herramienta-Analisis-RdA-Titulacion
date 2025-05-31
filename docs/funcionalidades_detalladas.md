@@ -2,19 +2,21 @@
 
 Este documento detalla las funcionalidades clave de la aplicación de análisis de Resultados de Aprendizaje (RdA).
 
-## 1. Funcionalidad Principal: Análisis Integral de un Resultado de Aprendizaje
+## 1. Funcionalidad Principal: Análisis Integral de un Resultado de Aprendizaje o varios Resultados de Aprendizaje.
 
-La aplicación permite al usuario ingresar un único Resultado de Aprendizaje (RdA) en formato de texto para su análisis exhaustivo a través de cuatro dimensiones críticas.
+La aplicación permite al usuario ingresar el o los Resultados de Aprendizaje (RdA) en formato de texto como en formato archivo estructurado (tabla) para su análisis exhaustivo a través de cuatro dimensiones críticas.
 
 *   **Entrada:**
-    *   Un campo de texto en la interfaz web donde el usuario puede escribir o pegar el RdA.
+    *   Un campo de texto en la interfaz web donde el usuario puede escribir o pegar el/los RdA.
 *   **Proceso de Activación:**
-    *   Un botón (ej. "Analizar RdA") que, al ser presionado, inicia el proceso de análisis.
+    *   Un botón (ej. "Analizar ") que, al ser presionado, inicia el proceso de análisis.
 *   **Salida (Visualización en Interfaz):**
     *   La interfaz muestra una sección de resultados para cada una de las dimensiones analizadas, presentando:
-        *   Una puntuación o clasificación.
+        *   `Resultados de Analisis detallado` por Rda con Una puntuación o clasificación.
         *   Comentarios específicos o retroalimentación.
         *   Sugerencias de mejora (cuando aplique).
+        *   Un `Resumen General` del análisis realizado (frecuencias o promedios de las dimensiones analizadas).
+        *   Rdas que no cumplen con los criterios de análisis, si los hay (`RdAs que requieren atención`-en todas las dimensiones).
 
 ## 2. Detalle de las Dimensiones de Análisis
 
@@ -23,7 +25,7 @@ La aplicación permite al usuario ingresar un único Resultado de Aprendizaje (R
 *   **Objetivo:** Identificar y clasificar el nivel de proceso cognitivo que el RdA demanda del estudiante, según la taxonomía revisada de Bloom (Anderson y Krathwohl: Recordar, Comprender, Aplicar, Analizar, Evaluar, Crear).
 *   **Método (General):**
     *   El módulo `bloom_analyzer.py` procesa el texto del RdA.
-    *   Identifica los verbos principales y los compara con listas de verbos asociados a cada nivel cognitivo.
+    *   Identifica los verbos principales y los compara con listas de verbos asociados (`taxonomy_bloom.json`) a cada nivel cognitivo.
     *   Puede considerar la estructura de la frase para refinar la clasificación.
 *   **Salida Específica:**
     *   El nivel cognitivo identificado (ej. "Aplicar").
@@ -58,15 +60,15 @@ La aplicación permite al usuario ingresar un único Resultado de Aprendizaje (R
 *   **Objetivo:** Valorar la relevancia, pertinencia y adecuación contextual del RdA. Se busca que el aprendizaje propuesto sea significativo y aplicable.
 *   **Método (General):**
     *   El módulo `authenticity_analyzer.py` puede considerar:
-        *   La conexión del RdA con contextos reales o profesionales (si es posible inferirlo).
+        *   La conexión del RdA con contextos reales o profesionales (inferido en base a la rúbrica).
         *   La adecuación al nivel educativo o perfil del estudiante (si se proporciona esta información o se infiere).
-        *   La alineación con competencias más amplias (si se define).
+        *   La alineación con competencias más amplias (`professional_keywords.json`).
 *   **Salida Específica:**
     *   Una evaluación cualitativa o cuantitativa de la autenticidad.
     *   Comentarios sobre la aplicabilidad o relevancia del RdA.
 
-## 3. Otras Funcionalidades (Si Aplican)
+## 3. Otras Funcionalidades 
 
-*   **[Ejemplo: Descarga de Reporte]**
-    *   **Descripción:** [Si su aplicación permite descargar el análisis, descríbalo aquí. Ej: "La aplicación permite al usuario descargar un resumen del análisis del RdA en formato PDF/CSV."].
-    *   **Acceso:** [Ej: "Un botón 'Descargar Reporte' aparece después de completar el análisis."].
+*   *   **Descarga de Reporte**
+    *   **Descripción:** "La aplicación permite al usuario descargar un resumen del Análisis detallado del RdA y un Resumen Generalen formato xlsx.".
+    *   **Acceso:** "Un botón 'Descargar Analisis Detallado' y otro botón 'Descargar Resumen General' aparece después de completar el análisis visualmente identificables.".
