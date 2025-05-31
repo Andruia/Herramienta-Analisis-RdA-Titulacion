@@ -59,8 +59,8 @@ el desarrollo, los resultados y las conclusiones, puede ser consultado según el
 
 1.  **Clonar el repositorio (recomendado):**
     ```bash
-    git clone [URL_DE_SU_REPOSITORIO_AQUI]
-    cd [NOMBRE_DE_SU_REPOSITORIO]
+    git clone https://github.com/Andruia/Herramienta-Analisis-RdA-Titulacion.git
+    cd Herramienta-Analisis-RdA-Titulacion
     ```
     Alternativamente, puede descargar el código como un archivo ZIP desde GitHub y descomprimirlo.
 
@@ -89,7 +89,7 @@ el desarrollo, los resultados y las conclusiones, puede ser consultado según el
 1.  **Navegar a la raíz del proyecto:**
     Asegúrese de estar en la carpeta principal del repositorio (donde se encuentra la carpeta `src/`).
     ```bash
-    cd [NOMBRE_DE_SU_REPOSITORIO] 
+    cd Herramienta-Analisis-RdA-Titulacion 
     # (Si no está ya allí)
     ```
 
@@ -121,7 +121,8 @@ Puede utilizar los siguientes RdA para una prueba rápida dentro de la aplicaci�
 
 ## Contribución y Contacto
 
-Este proyecto fue desarrollado por Rubén M. Tocaín G. 
+Este proyecto fue desarrollado por Rubén M. Tocaín G.
+
 Para cualquier consulta o sugerencia, puede contactar a rtocain@gmail.com
 ## 📢 Notas Finales
 Este proyecto es parte del trabajo de titulación de maestría, desarrollado con enfoque en inteligencia artificial aplicada a la educación. 
