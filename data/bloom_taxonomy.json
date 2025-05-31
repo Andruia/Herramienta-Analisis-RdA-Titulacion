@@ -1,0 +1,27 @@
+{
+  "recordar": [
+    "reconocer", "listar", "describir",
+    "recuperar", "denominar", "localizar","recordar"
+  ],
+  "comprender": [
+    "interpretar", "ejemplificar", "clasificar", "resumir", 
+    "inferir", "comparar", "explicar","parafrasea", "comprender"
+  ],
+  "aplicar": [
+    "ejecutar", "implementar", "desempeñar", 
+    "usar", "aplicar"
+  ],
+  "analizar": [
+    "diferenciar", "organizar", "atribuir", "comparar",
+    "deconstruir", "delinear", "estructurar", "integrar", "analizar"
+  ],
+  "evaluar": [
+    "comprobar", "criticar", "revisar", "formular",
+    "hipótesis", "experimentar", "juzgar", "probar", 
+    "detectar", "monitorear","evaluar"
+  ],
+  "crear": [
+    "generar", "planear", "producir", "diseñar",
+    "construir", "idear", "trazar", "elaborar","crear"
+  ]
+}
