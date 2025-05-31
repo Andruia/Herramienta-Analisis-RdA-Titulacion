@@ -7,8 +7,11 @@ utilizando técnicas de Procesamiento de Lenguaje Natural (NLP) y presentada a t
 de una aplicación web con Streamlit.
 
 **Autor:** Rubén Mauricio Tocaín Garzón
+
 **Programa:** Maestría en Inteligencia Artificial Aplicada
+
 **Universidad:** Universidad Hemisferios
+
 **Fecha:** Mayo 2025
 
 ## Descripción General
