@@ -140,5 +140,209 @@
         "política_expansión", "estrategia_crecimiento", "diversificación_relacionada", "diversificación_no_relacionada", "integración_vertical",
         "análisis_competitivo", "liderazgo_costos", "diferenciación", "enfoque", "océano_azul",
         "alianza_estratégica", "joint_venture", "fusión_estratégica", "consejo_administración", "código_buen_gobierno"
+    ],
+        
+    "edicion_graficos_vectoriales_mapas_bits": [
+        "vectorización", "bezier", "nodos", "anclas", "trazados", "curvas_spline", 
+        "illustrator", "corel_draw", "inkscape", "paths", "stroke", "fill",
+        "mapas_bits", "píxeles", "resolución", "DPI", "PPI", "rasterización",
+        "photoshop", "gimp", "bitmap", "RGB", "CMYK", "HSB", "LAB",
+        "canales_color", "capas", "máscaras", "selecciones", "filtros_digitales",
+        "interpolación", "antialiasing", "compresión_imagen", "formatos_archivo",
+        "JPG", "PNG", "TIFF", "EPS", "SVG", "AI", "PSD",
+        "edición_no_destructiva", "objetos_inteligentes", "ajustes_capa",
+        "blend_modes", "opacity", "transformaciones", "escalado_vectorial",
+        "rasterización_vectores", "trazado_automático", "simplificación_trazos"
+    ],
+        
+    "elementos_diseno_grafico": [
+        "punto", "línea", "plano", "volumen", "textura_visual", "textura_táctil",
+        "forma", "figura", "contorno", "silueta", "espacio_positivo", "espacio_negativo",
+        "composición", "equilibrio", "simetría", "asimetría", "ritmo_visual", "proporción",
+        "escala", "jerarquía_visual", "contraste", "armonía", "unidad", "variedad",
+        "énfasis", "movimiento", "dirección", "tensión_visual", "peso_visual",
+        "centro_interés", "recorrido_visual", "lectura_imagen", "sintaxis_visual",
+        "semiótica_visual", "denotación", "connotación", "código_visual",
+        "lenguaje_gráfico", "alfabetidad_visual", "percepción_gestalt",
+        "leyes_gestalt", "proximidad", "semejanza", "continuidad", "cierre",
+        "figura_fondo", "pregnancia", "isomorfismo", "pregnancia_forma"
+    ],
+        
+    "fotografia_aplicada_diseno_grafico": [
+        "composición_fotográfica", "regla_tercios", "puntos_fuertes", "líneas_guía",
+        "profundidad_campo", "bokeh", "enfoque_selectivo", "desenfoque_artístico",
+        "iluminación_natural", "iluminación_artificial", "temperatura_color",
+        "balance_blancos", "exposición", "triángulo_exposición", "ISO", "apertura",
+        "velocidad_obturación", "histograma", "rango_dinámico", "HDR",
+        "retoque_fotográfico", "corrección_color", "ajuste_niveles", "curvas_tonales",
+        "saturación", "vibrance", "luminosidad", "contraste_local",
+        "eliminación_ruido", "enfoque_digital", "máscaras_enfoque",
+        "fotografía_producto", "fotografía_publicitaria", "fotografía_editorial",
+        "banco_imágenes", "stock_photography", "derechos_autor", "creative_commons",
+        "resolución_impresión", "resolución_web", "optimización_web", "compresión_JPEG"
+    ],
+        
+    "dibujo_tecnico": [
+        "proyección_ortogonal", "vistas_principales", "alzado", "planta", "perfil",
+        "perspectiva_cónica", "perspectiva_caballera", "perspectiva_militar",
+        "axonometría", "isométrica", "dimétrica", "trimétrica",
+        "acotación", "líneas_auxiliares", "líneas_cota", "tolerancias_dimensionales",
+        "escalas_gráficas", "escalas_normalizadas", "formatos_papel", "ISO_216",
+        "rotulación_técnica", "normalización", "simbología_técnica",
+        "cortes_secciones", "líneas_ocultas", "líneas_eje", "rayado_secciones",
+        "CAD", "AutoCAD", "dibujo_asistido", "coordenadas_cartesianas",
+        "coordenadas_polares", "layers", "bloques_CAD", "referencias_externas",
+        "ploteo", "escalas_impresión", "layout_presentación", "viewport",
+        "geometría_descriptiva", "rabatimiento", "verdadera_magnitud", "paralelismo_perpendicularidad"
+    ],
+        
+    "produccion_grafica_impresos": [
+        "preimpresión", "imposición", "sangrado", "marcas_corte", "marcas_registro",
+        "separación_colores", "cuatricromía", "tintas_directas", "Pantone", "HKS",
+        "trama_AM", "trama_FM", "lineatura", "ganancia_punto", "densitometría",
+        "offset", "serigrafía", "flexografía", "huecograbado", "tipografía_impresión",
+        "sustratos_impresión", "papeles_couché", "papel_offset", "cartulinas",
+        "acabados_impresión", "laminado", "barnizado", "estampado", "relieve",
+        "troquelado", "plegado", "encuadernación", "cosido", "encolado",
+        "pruebas_color", "matchprint", "cromalin", "ploteo_gran_formato",
+        "gestión_color", "perfiles_ICC", "calibración_monitor", "caracterización_impresora",
+        "workflow_impresión", "RIP", "PDF_impresión", "PDF_X", "overprint",
+        "trapping", "registro_color", "control_calidad_impresión"
+    ],
+        
+    "edicion_publicaciones_digitales": [
+        "maquetación_digital", "InDesign", "QuarkXPress", "retícula_modular",
+        "retícula_jerárquica", "retícula_manuscrita", "sistema_columnas",
+        "espaciado_interlineal", "tracking", "kerning", "justificación_texto",
+        "viudas_huérfanas", "cortes_palabra", "estilos_párrafo", "estilos_carácter",
+        "páginas_maestras", "numeración_páginas", "índices_automáticos",
+        "tabla_contenidos", "referencias_cruzadas", "hipervínculos",
+        "publicaciones_interactivas", "ePub", "PDF_interactivo", "folio",
+        "revistas_digitales", "flipbook", "responsive_design", "adaptable_layout",
+        "tipografía_web", "web_fonts", "optimización_lectura", "accesibilidad_digital",
+        "contraste_legibilidad", "jerarquía_información", "arquitectura_información",
+        "usabilidad", "experiencia_usuario", "diseño_responsive", "breakpoints",
+        "CSS_grid", "flexbox", "media_queries", "optimización_móvil"
+    ],
+        
+    "taller_diseno_informacion": [
+        "visualización_datos", "infografía", "infografía_estadística", "gráficos_barras",
+        "gráficos_sectores", "gráficos_líneas", "diagramas_flujo", "organigramas",
+        "mapas_conceptuales", "storytelling_visual", "narrativa_datos",
+        "jerarquización_información", "arquitectura_información", "taxonomías",
+        "sistemas_navegación", "breadcrumbs", "etiquetado", "findability",
+        "card_sorting", "tree_testing", "prototipado_información",
+        "wireframes", "mockups", "esquemas_contenido", "audit_contenido",
+        "diseño_instruccional", "señalética", "wayfinding", "pictogramas",
+        "iconografía_funcional", "sistemas_símbolos", "códigos_visuales",
+        "legibilidad", "lecturabilidad", "comprensión_visual", "cognitive_load",
+        "design_thinking", "user_research", "personas", "journey_mapping",
+        "testing_usabilidad", "eye_tracking", "heatmaps", "analytics_comportamiento"
+    ],
+        
+    "codificacion_visual_comunicacion": [
+        "semiótica", "signo_lingüístico", "significante", "significado", "referente",
+        "denotación", "connotación", "polisemia", "isotopía", "código_visual",
+        "sintaxis_visual", "paradigma", "sintagma", "retórica_visual",
+        "figuras_retóricas", "metáfora_visual", "metonimia", "sinécdoque",
+        "hipérbole_visual", "ironía_visual", "personificación", "alegoría",
+        "arquetipos_visuales", "iconoclastia", "iconografía", "iconología",
+        "análisis_imagen", "lectura_imagen", "alfabetización_visual",
+        "cultura_visual", "sociología_imagen", "antropología_visual",
+        "psicología_percepción", "cognición_visual", "memoria_visual",
+        "atención_visual", "procesamiento_información", "esquemas_mentales",
+        "estereotipos_visuales", "representación_social", "ideología_visual",
+        "poder_imagen", "manipulación_visual", "propaganda_visual", "subliminal"
+    ],
+        
+    "produccion_grafica_digital": [
+        "workflow_digital", "assets_digitales", "gestión_archivos", "versionado",
+        "repositorios_digitales", "DAM", "brand_guidelines", "style_guides",
+        "sistemas_diseño", "design_tokens", "componentes_reutilizables",
+        "prototipado_digital", "Figma", "Sketch", "Adobe_XD", "InVision",
+        "colaboración_tiempo_real", "handoff_desarrollo", "specs_técnicas",
+        "exportación_assets", "optimización_web", "sprites_CSS", "SVG_optimization",
+        "retina_displays", "density_independent", "escalabilidad_gráficos",
+        "animación_digital", "micro_interacciones", "transitions", "easing",
+        "motion_graphics", "After_Effects", "Cinema_4D", "rendering",
+        "compresión_video", "codecs", "streaming_optimization", "adaptive_bitrate",
+        "realidad_aumentada", "realidad_virtual", "diseño_inmersivo",
+        "interfaces_tangibles", "IoT_design", "voice_interfaces", "AI_design"
+    ],
+        
+    "gestion_calidad_diseno_grafico": [
+        "gestión_proyectos", "metodología_ágil", "scrum_design", "design_sprints",
+        "briefing_creativo", "propuesta_técnica", "cronograma_proyecto",
+        "presupuestación", "cotización_servicios", "gestión_tiempo",
+        "control_calidad", "estándares_ISO", "auditoría_diseño", "KPI_creativos",
+        "métricas_diseño", "ROI_diseño", "evaluación_impacto", "testing_AB",
+        "feedback_cliente", "revisión_pares", "control_versiones",
+        "documentación_proyecto", "entregables", "milestones", "deliverables",
+        "gestión_stakeholders", "comunicación_cliente", "presentación_propuestas",
+        "negociación_creativa", "resolución_conflictos", "liderazgo_creativo",
+        "team_building", "mentoring_junior", "capacitación_continua",
+        "benchmarking_competencia", "análisis_tendencias", "forecasting_design",
+        "innovación_procesos", "mejora_continua", "lean_design", "design_ops"
+    ],
+        
+    "redaccion_academica_diseno_grafico": [
+        "metodología_investigación", "marco_teórico", "estado_arte", "revisión_literatura",
+        "hipótesis_investigación", "objetivos_específicos", "justificación_problema",
+        "diseño_experimental", "variables_dependientes", "variables_independientes",
+        "muestra_representativa", "instrumentos_medición", "validez_confiabilidad",
+        "análisis_cuantitativo", "análisis_cualitativo", "triangulación_datos",
+        "interpretación_resultados", "discusión_hallazgos", "conclusiones_investigación",
+        "citación_APA", "referencias_bibliográficas", "plagio_académico",
+        "ética_investigación", "consentimiento_informado", "anonimato_participantes",
+        "escritura_académica", "estructura_paper", "abstract", "keywords",
+        "introducción_problema", "metodología_detallada", "resultados_análisis",
+        "discusión_teórica", "limitaciones_estudio", "futuras_investigaciones",
+        "peer_review", "publicación_científica", "factor_impacto", "indexación"
+    ],
+        
+    "integracion_curricular": [
+        "síntesis_conocimientos", "competencias_profesionales", "perfil_egreso",
+        "resultados_aprendizaje", "evaluación_competencias", "portafolio_profesional",
+        "proyecto_integrador", "capstone_project", "práctica_profesional",
+        "vinculación_sector_productivo", "empleabilidad", "inserción_laboral",
+        "networking_profesional", "soft_skills", "hard_skills", "competencias_transversales",
+        "pensamiento_crítico", "resolución_problemas", "creatividad_aplicada",
+        "innovación_social", "responsabilidad_profesional", "ética_diseño",
+        "sostenibilidad_diseño", "diseño_social", "impacto_ambiental",
+        "economía_circular", "cradle_to_cradle", "life_cycle_assessment",
+        "design_for_disassembly", "materiales_sostenibles", "huella_carbono",
+        "responsabilidad_social", "diseño_inclusivo", "accesibilidad_universal",
+        "diversidad_cultural", "perspectiva_género", "decolonización_diseño"
+    ],
+        
+    "emprendimientos_diseno": [
+        "modelo_negocio", "canvas_model", "propuesta_valor", "segmentación_mercado",
+        "análisis_competencia", "ventaja_competitiva", "diferenciación_marca",
+        "plan_negocios", "estudio_factibilidad", "análisis_financiero",
+        "proyección_ventas", "flujo_caja", "punto_equilibrio", "TIR", "VPN",
+        "fuentes_financiamiento", "capital_semilla", "inversionistas_ángel",
+        "venture_capital", "crowdfunding", "bootstrapping", "lean_startup",
+        "minimum_viable_product", "customer_development", "pivot_estratégico",
+        "growth_hacking", "marketing_digital", "social_media_marketing",
+        "content_marketing", "SEO_SEM", "email_marketing", "influencer_marketing",
+        "networking_empresarial", "pitch_deck", "elevator_pitch", "demo_day",
+        "incubadoras", "aceleradoras", "coworking", "ecosistema_emprendimiento",
+        "propiedad_intelectual", "registro_marca", "derechos_autor", "patentes_diseño"
+    ],
+        
+    "comunicacion_estrategica": [
+        "estrategia_comunicación", "public_relations", "comunicación_corporativa",
+        "identidad_corporativa", "imagen_corporativa", "reputación_marca",
+        "branding_estratégico", "arquitectura_marca", "brand_equity", "top_of_mind",
+        "posicionamiento_marca", "personalidad_marca", "valores_marca",
+        "storytelling_corporativo", "narrativa_marca", "content_strategy",
+        "plan_comunicación", "análisis_stakeholders", "mapeo_públicos",
+        "matriz_influencia", "comunicación_interna", "comunicación_externa",
+        "crisis_comunicación", "management_crisis", "protocolo_crisis",
+        "relaciones_medios", "press_release", "media_kit", "rueda_prensa",
+        "comunicación_digital", "social_listening", "community_management",
+        "engagement_rate", "reach_organico", "paid_media", "earned_media",
+        "owned_media", "integrated_marketing", "omnichannel", "customer_journey",
+        "touchpoints", "experiencia_marca", "advocacy_programa", "word_of_mouth"
     ]
 }
