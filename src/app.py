@@ -27,6 +27,11 @@ try:
     from authenticity_analyzer import check_authenticity, PROFESSIONAL_KEYWORDS
     # <<< AÑADIDO >>> Importar la nueva función de dimensión del conocimiento
     from src.knowledge_analyzer import check_knowledge_dimension
+    # <<< AÑADIDO >>> Importar módulo de generación PDF
+    from src.pdf_generator import (
+        generate_detailed_pdf, generate_executive_pdf,
+        generate_level_pdf, generate_complete_pdf
+    )
 except ImportError as e:
     st.error(f"Error al importar módulos: {e}")
     st.error(f"Asegúrate de que los archivos .py necesarios estén en la carpeta 'src' y que ejecutas Streamlit desde la carpeta raíz del proyecto: {PROJECT_ROOT}")
@@ -379,6 +384,100 @@ if analyze_button:
                     key='dl_detailed' # Key única
                 )
 
+                # --- Botones de Exportación PDF Andru.ia ---
+                st.markdown("---")
+                st.markdown("### 🤖 **Exportación PDF Profesional Andru.ia**")
+
+                # Crear columnas para los botones PDF
+                col_pdf1, col_pdf2, col_pdf3, col_pdf4 = st.columns(4)
+
+                with col_pdf1:
+                    if st.button("📄 PDF Detallado", help="Exportar análisis completo con todas las métricas", key="btn_pdf_detailed"):
+                        try:
+                            with st.spinner("Generando PDF detallado..."):
+                                pdf_data = generate_detailed_pdf(results_df)
+                                st.download_button(
+                                    label="⬇️ Descargar PDF Detallado",
+                                    data=pdf_data,
+                                    file_name=f"Andru_Analisis_Detallado_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_pdf_detailed"
+                                )
+                                st.success("✅ PDF detallado generado exitosamente")
+                        except Exception as e:
+                            st.error(f"Error al generar PDF detallado: {str(e)}")
+
+                with col_pdf2:
+                    if st.button("📊 PDF Ejecutivo", help="Resumen gerencial con métricas clave", key="btn_pdf_executive"):
+                        try:
+                            with st.spinner("Generando PDF ejecutivo..."):
+                                pdf_data = generate_executive_pdf(results_df)
+                                st.download_button(
+                                    label="⬇️ Descargar PDF Ejecutivo",
+                                    data=pdf_data,
+                                    file_name=f"Andru_Reporte_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_pdf_executive"
+                                )
+                                st.success("✅ PDF ejecutivo generado exitosamente")
+                        except Exception as e:
+                            st.error(f"Error al generar PDF ejecutivo: {str(e)}")
+
+                with col_pdf3:
+                    # Selector de nivel para PDF por nivel
+                    selected_level = st.selectbox(
+                        "Nivel:",
+                        ['2', '4', '6', '8'],
+                        key="select_level_pdf",
+                        help="Seleccionar nivel académico para filtrar"
+                    )
+                    if st.button("🎯 PDF por Nivel", help=f"Análisis específico para nivel {selected_level}", key="btn_pdf_level"):
+                        try:
+                            with st.spinner(f"Generando PDF para nivel {selected_level}..."):
+                                pdf_data = generate_level_pdf(results_df, selected_level)
+                                st.download_button(
+                                    label=f"⬇️ Descargar PDF Nivel {selected_level}",
+                                    data=pdf_data,
+                                    file_name=f"Andru_Nivel_{selected_level}_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_pdf_level"
+                                )
+                                st.success(f"✅ PDF nivel {selected_level} generado exitosamente")
+                        except Exception as e:
+                            st.error(f"Error al generar PDF por nivel: {str(e)}")
+
+                with col_pdf4:
+                    if st.button("📋 PDF Completo", help="Reporte integral con todos los análisis", key="btn_pdf_complete"):
+                        try:
+                            with st.spinner("Generando PDF completo..."):
+                                pdf_data = generate_complete_pdf(results_df)
+                                st.download_button(
+                                    label="⬇️ Descargar PDF Completo",
+                                    data=pdf_data,
+                                    file_name=f"Andru_Reporte_Completo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_pdf_complete"
+                                )
+                                st.success("✅ PDF completo generado exitosamente")
+                        except Exception as e:
+                            st.error(f"Error al generar PDF completo: {str(e)}")
+
+                # Información adicional sobre los PDFs
+                with st.expander("ℹ️ Información sobre los Reportes PDF"):
+                    st.markdown("""
+                    **📄 PDF Detallado**: Incluye tabla completa con todos los RdAs analizados, métricas detalladas y recomendaciones específicas.
+
+                    **📊 PDF Ejecutivo**: Resumen gerencial con métricas clave, gráficos de distribución y recomendaciones estratégicas.
+
+                    **🎯 PDF por Nivel**: Análisis filtrado por nivel académico específico (2, 4, 6, 8) con métricas contextualizadas.
+
+                    **📋 PDF Completo**: Reporte integral que combina análisis detallado, resumen ejecutivo y recomendaciones comprensivas.
+
+                    *Todos los reportes incluyen branding profesional Andru.ia y están optimizados para impresión.*
+                    """)
+
+                st.markdown("---")
+
 
             # --- Mostrar Resumen General ---
             st.subheader("Resumen General")
@@ -443,6 +542,43 @@ if analyze_button:
                     mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                     key='download_summary'
                 )
+
+                # --- Botones PDF para Resumen General ---
+                st.markdown("#### 🤖 **Exportación PDF - Resumen General**")
+
+                col_summary_pdf1, col_summary_pdf2 = st.columns(2)
+
+                with col_summary_pdf1:
+                    if st.button("📊 PDF Resumen Ejecutivo", help="Resumen general con métricas agregadas", key="btn_summary_pdf_executive"):
+                        try:
+                            with st.spinner("Generando PDF resumen ejecutivo..."):
+                                pdf_data = generate_executive_pdf(results_df)
+                                st.download_button(
+                                    label="⬇️ Descargar PDF Resumen",
+                                    data=pdf_data,
+                                    file_name=f"Andru_Resumen_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_summary_pdf_executive"
+                                )
+                                st.success("✅ PDF resumen ejecutivo generado")
+                        except Exception as e:
+                            st.error(f"Error al generar PDF resumen: {str(e)}")
+
+                with col_summary_pdf2:
+                    if st.button("📈 PDF con Gráficos", help="Resumen con visualizaciones y distribuciones", key="btn_summary_pdf_charts"):
+                        try:
+                            with st.spinner("Generando PDF con gráficos..."):
+                                pdf_data = generate_complete_pdf(results_df)
+                                st.download_button(
+                                    label="⬇️ Descargar PDF Gráficos",
+                                    data=pdf_data,
+                                    file_name=f"Andru_Resumen_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                    mime="application/pdf",
+                                    key="dl_summary_pdf_charts"
+                                )
+                                st.success("✅ PDF con gráficos generado")
+                        except Exception as e:
+                            st.error(f"Error al generar PDF con gráficos: {str(e)}")
             # --- Fin Descarga Consolidada ---
 
 
