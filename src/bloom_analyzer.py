@@ -26,10 +26,20 @@ TAXONOMY_PATH = os.path.join(os.path.dirname(CURRENT_DIR), 'data', 'bloom_taxono
 
 # --- REGLAS DE ADECUACIÓN (EJEMPLO - ¡AJUSTAR!) ---
 APPROPRIATENESS_RULES = {
-    '6': {
+    '2': {
         'bajo': [],
-        'apropiado': ['recordar', 'comprender', 'aplicar'],
-        'alto': ['analizar', 'evaluar', 'crear']
+        'apropiado': ['recordar', 'comprender'],
+        'alto': ['aplicar', 'analizar', 'evaluar', 'crear']
+    },
+    '4': {
+        'bajo': ['recordar'],
+        'apropiado': ['comprender', 'aplicar', 'analizar'],
+        'alto': ['evaluar', 'crear']
+    },
+    '6': {
+        'bajo': ['recordar','comprender'],
+        'apropiado': ['aplicar', 'analizar'],
+        'alto': ['evaluar', 'crear']
     },
     '8': {
         'bajo': ['recordar', 'comprender'],
@@ -203,7 +213,71 @@ def check_appropriateness(bloom_level, academic_level_str):
 # --- Bloque para Pruebas (Opcional) ---
 if __name__ == '__main__':
     # Este bloque solo se ejecuta si corres el script directamente
-    print("-" * 30)
-    print("Iniciando pruebas directas de bloom_analyzer:")
-    # ... (código de prueba similar al anterior si lo necesitas) ...
-    print("-" * 30)
+    print("-" * 50)
+    print("PRUEBAS DEL SISTEMA EXPANDIDO DE ANÁLISIS BLOOM")
+    print("-" * 50)
+
+    # Ejemplos de prueba para diferentes niveles
+    test_cases = [
+        {
+            'text': 'El estudiante será capaz de recordar los principios básicos de auditoría',
+            'level': 2,
+            'description': 'Nivel 2 - Auditoría - Recordar'
+        },
+        {
+            'text': 'El estudiante podrá analizar estados financieros y detectar irregularidades',
+            'level': 4,
+            'description': 'Nivel 4 - Auditoría - Analizar'
+        },
+        {
+            'text': 'El estudiante diseñará estrategias de reclutamiento y selección de personal',
+            'level': 6,
+            'description': 'Nivel 6 - RRHH - Crear/Diseñar'
+        },
+        {
+            'text': 'El estudiante evaluará críticamente políticas de gestión del talento humano',
+            'level': 8,
+            'description': 'Nivel 8 - RRHH - Evaluar'
+        }
+    ]
+
+    for i, case in enumerate(test_cases, 1):
+        print(f"\n--- CASO {i}: {case['description']} ---")
+        print(f"Texto: {case['text']}")
+        print(f"Nivel académico: {case['level']}")
+
+        # Análisis completo con contexto
+        result = analyze_bloom_with_context(case['text'], case['level'])
+
+        print(f"Nivel Bloom detectado: {result['bloom_level']}")
+        print(f"Área profesional: {result['professional_area'] or 'No detectada'}")
+        print(f"Apropiación básica: {result['basic_appropriateness']}")
+        print(f"Apropiación contextual: {result['contextual_appropriateness']}")
+
+        if result['recommendations']:
+            print("Recomendaciones:")
+            for rec in result['recommendations']:
+                print(f"  • {rec}")
+
+    print("-" * 50)
+    print("MATRIZ DE APROPIACIÓN POR NIVELES")
+    print("-" * 50)
+
+    bloom_levels = ['recordar', 'comprender', 'aplicar', 'analizar', 'evaluar', 'crear']
+    academic_levels = ['2', '4', '6', '8']
+
+    print(f"{'Bloom/Nivel':<12}", end="")
+    for level in academic_levels:
+        print(f"{level:>15}", end="")
+    print()
+
+    for bloom in bloom_levels:
+        print(f"{bloom:<12}", end="")
+        for academic in academic_levels:
+            appropriateness = check_appropriateness(bloom, int(academic))
+            symbol = "✓" if appropriateness == "Apropiado" else "⚠" if "Bajo" in appropriateness else "⬆" if "Alto" in appropriateness else "?"
+            print(f"{symbol:>15}", end="")
+        print()
+
+    print("\nLeyenda: ✓=Apropiado, ⚠=Potencialmente Bajo, ⬆=Potencialmente Alto")
+    print("-" * 50)

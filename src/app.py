@@ -71,20 +71,44 @@ st.sidebar.header("Opciones de Análisis")
 
 # Selector global, principalmente para "Pegar Texto"
 global_academic_level = st.sidebar.selectbox(
-    "Nivel Académico (para 'Pegar Texto'):", ('6', '8'), index=0
+    "Nivel Académico (para 'Pegar Texto'):", ('2', '4', '6', '8'), index=0
 )
 st.sidebar.info(f"Nivel Académico Global seleccionado: **{global_academic_level}** (Usado si pega texto o archivo .txt)")
 
 # Texto informativo sobre niveles Bloom esperados (basado en selector global)
 expected_bloom_levels_text = ""
-if global_academic_level == '6':
-    expected_bloom_levels_text = "Nivel 6: Se esperan niveles Bloom **3 (Aplicar) a 4 (Analizar)**."
+if global_academic_level == '2':
+    expected_bloom_levels_text = "Nivel 2: Se esperan niveles Bloom **1 (Recordar) a 2 (Comprender)** como apropiados."
+elif global_academic_level == '4':
+    expected_bloom_levels_text = "Nivel 4: Se esperan niveles Bloom **2 (Comprender) a 4 (Analizar)** como apropiados."
+elif global_academic_level == '6':
+    expected_bloom_levels_text = "Nivel 6: Se esperan niveles Bloom **1 (Recordar) a 3 (Aplicar)** como apropiados."
 elif global_academic_level == '8':
-    expected_bloom_levels_text = "Nivel 8: Se esperan niveles Bloom **4 (Analizar) a 6 (Crear)**."
+    expected_bloom_levels_text = "Nivel 8: Se esperan niveles Bloom **3 (Aplicar) a 6 (Crear)** como apropiados."
 if expected_bloom_levels_text:
     st.sidebar.markdown(f"ℹ️ *{expected_bloom_levels_text}*")
 
 st.sidebar.divider() # Separador visual
+
+# Información adicional sobre progresión pedagógica
+with st.sidebar.expander("📚 Progresión Pedagógica por Niveles"):
+    st.markdown("""
+    **Nivel 2 (Fundamentos):**
+    - Enfoque en construcción de bases conceptuales
+    - Apropiados: Recordar, Comprender
+
+    **Nivel 4 (Desarrollo):**
+    - Desarrollo de habilidades de aplicación y análisis
+    - Apropiados: Comprender, Aplicar, Analizar
+
+    **Nivel 6 (Integración):**
+    - Integración y síntesis equilibrada
+    - Apropiados: Recordar, Comprender, Aplicar
+
+    **Nivel 8 (Dominio):**
+    - Dominio profesional y pensamiento crítico avanzado
+    - Apropiados: Aplicar, Analizar, Evaluar, Crear
+    """)
 
 # Configuración Avanzada (Autenticidad)
 st.sidebar.expander("Configuración Avanzada (Autenticidad)").markdown(
@@ -147,7 +171,7 @@ else: # Método "Subir Archivo"
                     "Columna con el texto del RA:", available_columns, index=0, key="sel_ra_col"
                 )
                 col_academic_level = st.sidebar.selectbox(
-                    "Columna con el Nivel Académico (ej: 6 o 8):", available_columns, index=0, key="sel_level_col"
+                    "Columna con el Nivel Académico (ej: 2, 4, 6 o 8):", available_columns, index=0, key="sel_level_col"
                 )
 
                 if col_ra_text and col_academic_level and col_ra_text != col_academic_level:
