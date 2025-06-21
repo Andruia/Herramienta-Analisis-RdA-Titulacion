@@ -322,22 +322,7 @@ class AndruSymbols:
     
     # Símbolos de métricas
     TOTAL = "📊"
-    PORCENTAJE = "📈"
-    NIVEL = "🎯"
+    BLOOM = "🧠"
     VERIFICABILIDAD = "🔍"
-    
-    # Símbolos de sección
-    ANALISIS = "📋"
-    RESUMEN = "📊"
-    RECOMENDACIONES = "💡"
-    GRAFICOS = "📈"
-    
-    # Símbolos de Bloom
-    BLOOM_SYMBOLS = {
-        'recordar': "🧠",
-        'comprender': "💡",
-        'aplicar': "🔧",
-        'analizar': "🔍",
-        'evaluar': "⚖️",
-        'crear': "🎨"
-    }
+    CORRECCION = "✏️"
+    AUTENTICIDAD = "🎯"
