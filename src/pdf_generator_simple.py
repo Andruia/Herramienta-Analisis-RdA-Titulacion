@@ -21,90 +21,92 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
     doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), leftMargin=30, rightMargin=30)
     story = []
     styles = getSampleStyleSheet()
-    
+
     # Configurar estilo matplotlib
     plt.style.use('default')
     colors_palette = ['#2E86AB', '#A23B72', '#F18F01', '#C73E1D', '#592E83', '#0F7B0F', '#FF6B35', '#004E89']
-    
+
     # Título principal
     story.append(Paragraph(title, styles['Title']))
     story.append(Spacer(1, 15))
-    
+
     # Fecha y resumen
     fecha = datetime.now().strftime("%d/%m/%Y %H:%M")
     story.append(Paragraph(f"<b>Generado:</b> {fecha} | <b>Total RdAs:</b> {len(data)}", styles['Normal']))
     story.append(Spacer(1, 20))
-    
+
     if isinstance(data, list) and len(data) > 0:
-        
+
         # === PÁGINA 1: DISTRIBUCIONES ===
         story.append(Paragraph("<b>DISTRIBUCIONES GENERALES</b>", styles['Heading1']))
         story.append(Spacer(1, 10))
-        
+
         # GRÁFICO 1: Distribución por Nivel Bloom
         bloom_counts = {}
         for item in data:
             bloom_level = item.get('Nivel Bloom Detectado', 'N/A')
             bloom_counts[bloom_level] = bloom_counts.get(bloom_level, 0) + 1
-        
+
         if bloom_counts:
-            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-            
+            # TAMAÑO OPTIMIZADO: 10x4 para landscape
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
+
             # Gráfico de barras - Bloom
             levels = list(bloom_counts.keys())
             counts = list(bloom_counts.values())
             bars1 = ax1.bar(levels, counts, color=colors_palette[:len(levels)])
-            ax1.set_title('Distribución por Nivel de Bloom', fontsize=14, fontweight='bold')
+            ax1.set_title('Distribución por Nivel de Bloom', fontsize=12, fontweight='bold')
             ax1.set_xlabel('Nivel de Bloom')
             ax1.set_ylabel('Cantidad de RdAs')
-            
+
             # Añadir valores en las barras
             for bar in bars1:
                 height = bar.get_height()
                 ax1.text(bar.get_x() + bar.get_width()/2., height,
                        f'{int(height)}', ha='center', va='bottom', fontweight='bold')
-            
+
             # GRÁFICO 2: Distribución por Nivel Académico
             level_counts = {}
             for item in data:
                 level = item.get('Nivel Académico Origen', 'N/A')
                 level_counts[level] = level_counts.get(level, 0) + 1
-            
+
             if level_counts:
                 levels_ac = list(level_counts.keys())
                 counts_ac = list(level_counts.values())
-                wedges, texts, autotexts = ax2.pie(counts_ac, labels=[f'Nivel {l}' for l in levels_ac], 
-                                                  autopct='%1.1f%%', colors=colors_palette[:len(levels_ac)], 
+                wedges, texts, autotexts = ax2.pie(counts_ac, labels=[f'Nivel {l}' for l in levels_ac],
+                                                  autopct='%1.1f%%', colors=colors_palette[:len(levels_ac)],
                                                   startangle=90)
-                ax2.set_title('Distribución por Nivel Académico', fontsize=14, fontweight='bold')
-                
+                ax2.set_title('Distribución por Nivel Académico', fontsize=12, fontweight='bold')
+
                 # Mejorar legibilidad
                 for autotext in autotexts:
                     autotext.set_color('white')
                     autotext.set_fontweight('bold')
-            
+
             plt.tight_layout()
-            
-            # Guardar y añadir al PDF
+
+            # Guardar y añadir al PDF - TAMAÑO OPTIMIZADO
             img_buffer1 = io.BytesIO()
-            plt.savefig(img_buffer1, format='png', dpi=150, bbox_inches='tight')
+            plt.savefig(img_buffer1, format='png', dpi=120, bbox_inches='tight')
             img_buffer1.seek(0)
             plt.close()
-            
-            img1 = Image(img_buffer1, width=8*inch, height=3.5*inch)
+
+            # TAMAÑO AJUSTADO: 7x2.8 pulgadas para caber en landscape
+            img1 = Image(img_buffer1, width=7*inch, height=2.8*inch)
             story.append(img1)
             story.append(Spacer(1, 20))
-        
+
         # === PÁGINA 2: VERIFICABILIDAD ===
         story.append(PageBreak())
         story.append(Paragraph("<b>ANÁLISIS DE VERIFICABILIDAD</b>", styles['Heading1']))
         story.append(Spacer(1, 10))
-        
+
         # Calcular promedios de verificabilidad
         verificability_metrics = ['Puntaje Observable', 'Puntaje Medible', 'Puntaje Evaluable', 'Puntaje Corrección']
         verificability_averages = []
         verificability_labels = ['Observable', 'Medible', 'Evaluable', 'Corrección']
-        
+
         for metric in verificability_metrics:
             scores = []
             for item in data:
@@ -113,50 +115,52 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
                     scores.append(score)
                 elif str(score).replace('.', '').isdigit():
                     scores.append(float(score))
-            
+
             if scores:
                 verificability_averages.append(sum(scores) / len(scores))
             else:
                 verificability_averages.append(0)
-        
+
         if verificability_averages:
-            fig, ax = plt.subplots(figsize=(10, 6))
-            bars = ax.bar(verificability_labels, verificability_averages, 
+            # TAMAÑO OPTIMIZADO: 8x4 para landscape
+            fig, ax = plt.subplots(figsize=(8, 4))
+            bars = ax.bar(verificability_labels, verificability_averages,
                          color=['#2E86AB', '#A23B72', '#F18F01', '#C73E1D'], width=0.6)
-            
-            ax.set_title('Promedios de Verificabilidad por Métrica', fontsize=16, fontweight='bold', pad=20)
+
+            ax.set_title('Promedios de Verificabilidad por Métrica', fontsize=14, fontweight='bold', pad=20)
             ax.set_ylabel('Puntuación Promedio (0-3)', fontsize=12)
             ax.set_ylim(0, 3.2)
             ax.grid(axis='y', alpha=0.3)
-            
+
             # Añadir valores en las barras
             for bar, avg in zip(bars, verificability_averages):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height + 0.05,
                        f'{avg:.2f}', ha='center', va='bottom', fontweight='bold', fontsize=11)
-            
+
             plt.xticks(rotation=0)
             plt.tight_layout()
-            
+
             img_buffer2 = io.BytesIO()
-            plt.savefig(img_buffer2, format='png', dpi=150, bbox_inches='tight')
+            plt.savefig(img_buffer2, format='png', dpi=120, bbox_inches='tight')
             img_buffer2.seek(0)
             plt.close()
-            
-            img2 = Image(img_buffer2, width=7*inch, height=4*inch)
+
+            # TAMAÑO AJUSTADO: 6x3 pulgadas
+            img2 = Image(img_buffer2, width=6*inch, height=3*inch)
             story.append(img2)
             story.append(Spacer(1, 20))
-        
+
         # === PÁGINA 3: AUTENTICIDAD ===
         story.append(PageBreak())
         story.append(Paragraph("<b>ANÁLISIS DE AUTENTICIDAD</b>", styles['Heading1']))
         story.append(Spacer(1, 10))
-        
+
         # Calcular promedios de autenticidad
         authenticity_metrics = ['Autenticidad Acción', 'Autenticidad Contexto', 'Autenticidad Sentido']
         authenticity_averages = []
         authenticity_labels = ['Acción', 'Contexto', 'Sentido']
-        
+
         for metric in authenticity_metrics:
             scores = []
             for item in data:
@@ -165,50 +169,52 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
                     scores.append(score)
                 elif str(score).replace('.', '').isdigit():
                     scores.append(float(score))
-            
+
             if scores:
                 authenticity_averages.append(sum(scores) / len(scores))
             else:
                 authenticity_averages.append(0)
-        
+
         if authenticity_averages:
-            fig, ax = plt.subplots(figsize=(8, 6))
-            bars = ax.bar(authenticity_labels, authenticity_averages, 
+            # TAMAÑO OPTIMIZADO: 7x4 para landscape
+            fig, ax = plt.subplots(figsize=(7, 4))
+            bars = ax.bar(authenticity_labels, authenticity_averages,
                          color=['#592E83', '#0F7B0F', '#FF6B35'], width=0.5)
-            
-            ax.set_title('Promedios de Autenticidad por Dimensión', fontsize=16, fontweight='bold', pad=20)
+
+            ax.set_title('Promedios de Autenticidad por Dimensión', fontsize=14, fontweight='bold', pad=20)
             ax.set_ylabel('Puntuación Promedio', fontsize=12)
             ax.set_ylim(0, max(authenticity_averages) * 1.2 if authenticity_averages else 1)
             ax.grid(axis='y', alpha=0.3)
-            
+
             # Añadir valores en las barras
             for bar, avg in zip(bars, authenticity_averages):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height + height*0.02,
                        f'{avg:.2f}', ha='center', va='bottom', fontweight='bold', fontsize=11)
-            
+
             plt.tight_layout()
-            
+
             img_buffer3 = io.BytesIO()
-            plt.savefig(img_buffer3, format='png', dpi=150, bbox_inches='tight')
+            plt.savefig(img_buffer3, format='png', dpi=120, bbox_inches='tight')
             img_buffer3.seek(0)
             plt.close()
-            
-            img3 = Image(img_buffer3, width=6*inch, height=4*inch)
+
+            # TAMAÑO AJUSTADO: 5.5x3 pulgadas
+            img3 = Image(img_buffer3, width=5.5*inch, height=3*inch)
             story.append(img3)
             story.append(Spacer(1, 20))
-        
+
         # === PÁGINA 4: CONOCIMIENTO ===
         story.append(PageBreak())
         story.append(Paragraph("<b>ANÁLISIS DE DIMENSIONES DEL CONOCIMIENTO</b>", styles['Heading1']))
         story.append(Spacer(1, 10))
-        
+
         # Calcular promedios de conocimiento
-        knowledge_metrics = ['Conocimiento Factual', 'Conocimiento Conceptual', 
+        knowledge_metrics = ['Conocimiento Factual', 'Conocimiento Conceptual',
                            'Conocimiento Procedimental', 'Conocimiento Metacognitivo']
         knowledge_averages = []
         knowledge_labels = ['Factual', 'Conceptual', 'Procedimental', 'Metacognitivo']
-        
+
         for metric in knowledge_metrics:
             scores = []
             for item in data:
@@ -217,83 +223,87 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
                     scores.append(score)
                 elif str(score).replace('.', '').isdigit():
                     scores.append(float(score))
-            
+
             if scores:
                 knowledge_averages.append(sum(scores) / len(scores))
             else:
                 knowledge_averages.append(0)
-        
+
         if knowledge_averages:
-            fig, ax = plt.subplots(figsize=(10, 6))
-            bars = ax.bar(knowledge_labels, knowledge_averages, 
+            # TAMAÑO OPTIMIZADO: 8x4 para landscape
+            fig, ax = plt.subplots(figsize=(8, 4))
+            bars = ax.bar(knowledge_labels, knowledge_averages,
                          color=['#004E89', '#2E86AB', '#A23B72', '#F18F01'], width=0.6)
-            
-            ax.set_title('Promedios por Dimensión del Conocimiento', fontsize=16, fontweight='bold', pad=20)
+
+            ax.set_title('Promedios por Dimensión del Conocimiento', fontsize=14, fontweight='bold', pad=20)
             ax.set_ylabel('Puntuación Promedio', fontsize=12)
             ax.set_ylim(0, max(knowledge_averages) * 1.2 if knowledge_averages else 1)
             ax.grid(axis='y', alpha=0.3)
-            
+
             # Añadir valores en las barras
             for bar, avg in zip(bars, knowledge_averages):
                 height = bar.get_height()
                 ax.text(bar.get_x() + bar.get_width()/2., height + height*0.02,
                        f'{avg:.2f}', ha='center', va='bottom', fontweight='bold', fontsize=11)
-            
+
             plt.xticks(rotation=15, ha='right')
             plt.tight_layout()
-            
+
             img_buffer4 = io.BytesIO()
-            plt.savefig(img_buffer4, format='png', dpi=150, bbox_inches='tight')
+            plt.savefig(img_buffer4, format='png', dpi=120, bbox_inches='tight')
             img_buffer4.seek(0)
             plt.close()
-            
-            img4 = Image(img_buffer4, width=7*inch, height=4*inch)
+
+            # TAMAÑO AJUSTADO: 6x3 pulgadas
+            img4 = Image(img_buffer4, width=6*inch, height=3*inch)
             story.append(img4)
             story.append(Spacer(1, 20))
-        
+
         # === PÁGINA 5: COMPARACIÓN GENERAL ===
         story.append(PageBreak())
         story.append(Paragraph("<b>COMPARACIÓN GENERAL DE MÉTRICAS</b>", styles['Heading1']))
         story.append(Spacer(1, 10))
-        
+
         # Gráfico de radar/spider con todas las métricas principales
         all_metrics = verificability_averages + authenticity_averages + knowledge_averages
         all_labels = verificability_labels + [f'Aut.{l}' for l in authenticity_labels] + [f'K.{l}' for l in knowledge_labels]
-        
+
         if all_metrics and len(all_metrics) > 0:
             # Normalizar valores para el gráfico radar (0-1)
             max_val = max(all_metrics) if max(all_metrics) > 0 else 1
             normalized_metrics = [m/max_val for m in all_metrics]
-            
+
             # Crear gráfico radar
             angles = np.linspace(0, 2*np.pi, len(all_labels), endpoint=False).tolist()
             normalized_metrics += normalized_metrics[:1]  # Cerrar el círculo
             angles += angles[:1]
-            
-            fig, ax = plt.subplots(figsize=(10, 10), subplot_kw=dict(projection='polar'))
+
+            # TAMAÑO OPTIMIZADO: 8x5 para landscape (no cuadrado)
+            fig, ax = plt.subplots(figsize=(8, 5), subplot_kw=dict(projection='polar'))
             ax.plot(angles, normalized_metrics, 'o-', linewidth=2, color='#2E86AB')
             ax.fill(angles, normalized_metrics, alpha=0.25, color='#2E86AB')
             ax.set_xticks(angles[:-1])
-            ax.set_xticklabels(all_labels, fontsize=10)
+            ax.set_xticklabels(all_labels, fontsize=9)
             ax.set_ylim(0, 1)
-            ax.set_title('Comparación General de Todas las Métricas\n(Valores Normalizados)', 
-                        fontsize=14, fontweight='bold', pad=30)
+            ax.set_title('Comparación General de Todas las Métricas\n(Valores Normalizados)',
+                        fontsize=12, fontweight='bold', pad=20)
             ax.grid(True)
-            
+
             plt.tight_layout()
-            
+
             img_buffer5 = io.BytesIO()
-            plt.savefig(img_buffer5, format='png', dpi=150, bbox_inches='tight')
+            plt.savefig(img_buffer5, format='png', dpi=120, bbox_inches='tight')
             img_buffer5.seek(0)
             plt.close()
-            
-            img5 = Image(img_buffer5, width=7*inch, height=7*inch)
+
+            # TAMAÑO AJUSTADO: 6x3.5 pulgadas (rectangular, no cuadrado)
+            img5 = Image(img_buffer5, width=6*inch, height=3.5*inch)
             story.append(img5)
-    
+
     # Pie de página
     story.append(Spacer(1, 30))
     story.append(Paragraph("Generado por Andru.ia - Análisis Visual Completo (Solo Gráficos)", styles['Italic']))
-    
+
     doc.build(story)
     return buffer.getvalue()
 
