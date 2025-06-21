@@ -29,8 +29,8 @@ try:
     from src.knowledge_analyzer import check_knowledge_dimension
     # <<< AÑADIDO >>> Importar módulo de generación PDF
     from src.pdf_generator_simple import (
-        generate_detailed_pdf, generate_executive_pdf,
-        generate_level_pdf, generate_complete_pdf, generate_charts_pdf
+        generate_executive_pdf, generate_level_pdf,
+        generate_complete_pdf, generate_charts_pdf
     )
 except ImportError as e:
     st.error(f"Error al importar módulos: {e}")
@@ -387,6 +387,33 @@ if analyze_button:
             # --- Descarga Consolidada ---
             # <<< AÑADIDO >>> Sección de descarga de PDFs con estado persistente
             st.markdown("---")
+
+            # === INFORMACIÓN SOBRE LOS REPORTES ===
+            with st.expander("ℹ️ Información sobre los Reportes PDF"):
+                st.markdown("""
+                ### 📊 **PDF Ejecutivo** (Vertical)
+                - **Columnas**: RdA, Nivel Bloom, Observable, Medible, Evaluable, Corrección
+                - **Uso**: Resumen gerencial rápido y presentaciones ejecutivas
+                - **Formato**: A4 vertical, tabla compacta
+
+                ### 📋 **PDF Completo** (Horizontal)
+                - **Columnas**: 15 columnas completas con toda la información
+                - **Incluye**: Verbo, Adecuación, Autenticidad, Conocimiento, etc.
+                - **Formato**: A4 horizontal para máximo aprovechamiento del espacio
+                - **Uso**: Análisis detallado y documentación completa
+
+                ### 📈 **PDF Solo Gráficos** (Horizontal)
+                - **Contenido**: 5 páginas con SOLO visualizaciones (sin tablas)
+                - **Gráficos**: Distribuciones, Verificabilidad, Autenticidad, Conocimiento, Comparación
+                - **Formato**: A4 horizontal, gráficos de alta calidad
+                - **Uso**: Presentaciones visuales y análisis estadístico
+
+                ### 🎯 **PDFs por Nivel**
+                - **Contenido**: Tabla completa filtrada por nivel académico específico
+                - **Formato**: A4 horizontal con 15 columnas
+                - **Uso**: Análisis específico por nivel de formación
+                """)
+
             st.subheader("📥 Descarga de Reportes PDF")
 
             # Usar session_state para mantener el estado de los PDFs generados
@@ -411,9 +438,8 @@ if analyze_button:
                             'avg_bloom_score': 0
                         }
 
-                        # Generar todos los PDFs y guardarlos en cache
+                        # Generar PDFs optimizados (sin PDF detallado)
                         st.session_state.pdf_cache[cache_key] = {
-                            'detailed': generate_detailed_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
                             'executive': generate_executive_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
                             'complete': generate_complete_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
                             'charts': generate_charts_pdf(results_df.to_dict('records'), global_academic_level, common_stats)
@@ -428,93 +454,44 @@ if analyze_button:
                         st.error(f"Error al preparar PDFs: {str(e)}")
                         st.session_state.pdf_cache[cache_key] = {}
 
-            # Mostrar botones de descarga (sin regenerar PDFs)
+            # Mostrar botones de descarga principales (sin regenerar PDFs)
             if cache_key in st.session_state.pdf_cache and st.session_state.pdf_cache[cache_key]:
-                col_pdf1, col_pdf2, col_pdf3, col_pdf4 = st.columns(4)
+
+                # === REPORTES PRINCIPALES ===
+                st.markdown("**📊 Reportes Principales:**")
+                col_pdf1, col_pdf2, col_pdf3 = st.columns(3)
 
                 with col_pdf1:
-                    st.download_button(
-                        label="📄 PDF Detallado",
-                        data=st.session_state.pdf_cache[cache_key].get('detailed', b''),
-                        file_name=f"Andru_Detallado_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="Análisis básico con columnas esenciales",
-                        key="dl_pdf_detailed_cached"
-                    )
-
-                with col_pdf2:
                     st.download_button(
                         label="📊 PDF Ejecutivo",
                         data=st.session_state.pdf_cache[cache_key].get('executive', b''),
                         file_name=f"Andru_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
                         mime="application/pdf",
-                        help="Resumen gerencial con métricas clave",
+                        help="📋 Resumen gerencial con 6 columnas esenciales (vertical)",
                         key="dl_pdf_executive_cached"
                     )
 
-                with col_pdf3:
+                with col_pdf2:
                     st.download_button(
                         label="📋 PDF Completo",
                         data=st.session_state.pdf_cache[cache_key].get('complete', b''),
                         file_name=f"Andru_Completo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
                         mime="application/pdf",
-                        help="Reporte integral con todas las columnas (horizontal)",
+                        help="📊 Análisis integral con 15 columnas completas (horizontal)",
                         key="dl_pdf_complete_cached"
                     )
 
-                with col_pdf4:
+                with col_pdf3:
                     st.download_button(
-                        label="📈 PDF con Gráficos",
+                        label="📈 PDF Solo Gráficos",
                         data=st.session_state.pdf_cache[cache_key].get('charts', b''),
                         file_name=f"Andru_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
                         mime="application/pdf",
-                        help="Reporte con gráficos y análisis visual (horizontal)",
+                        help="📈 5 páginas con SOLO gráficos y análisis visual (sin tablas)",
                         key="dl_pdf_charts_cached"
                     )
 
-                # Segunda fila: PDFs por nivel
-                st.markdown("**📊 Reportes por Nivel Académico:**")
-                col_level1, col_level2, col_level3, col_level4 = st.columns(4)
-
-                with col_level1:
-                    st.download_button(
-                        label="🎯 Nivel 2",
-                        data=st.session_state.pdf_cache[cache_key].get('level_2', b''),
-                        file_name=f"Andru_Nivel2_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="Análisis específico para nivel 2",
-                        key="dl_pdf_level2_cached"
-                    )
-
-                with col_level2:
-                    st.download_button(
-                        label="🎯 Nivel 4",
-                        data=st.session_state.pdf_cache[cache_key].get('level_4', b''),
-                        file_name=f"Andru_Nivel4_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="Análisis específico para nivel 4",
-                        key="dl_pdf_level4_cached"
-                    )
-
-                with col_level3:
-                    st.download_button(
-                        label="🎯 Nivel 6",
-                        data=st.session_state.pdf_cache[cache_key].get('level_6', b''),
-                        file_name=f"Andru_Nivel6_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="Análisis específico para nivel 6",
-                        key="dl_pdf_level6_cached"
-                    )
-
-                with col_level4:
-                    st.download_button(
-                        label="🎯 Nivel 8",
-                        data=st.session_state.pdf_cache[cache_key].get('level_8', b''),
-                        file_name=f"Andru_Nivel8_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="Análisis específico para nivel 8",
-                        key="dl_pdf_level8_cached"
-                    )
+                st.markdown("---")
 
             # --- Fin Descarga Consolidada Mejorada ---
             st.subheader("Resumen General")
