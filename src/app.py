@@ -30,7 +30,7 @@ try:
     # <<< AÑADIDO >>> Importar módulo de generación PDF
     from src.pdf_generator_simple import (
         generate_detailed_pdf, generate_executive_pdf,
-        generate_level_pdf, generate_complete_pdf
+        generate_level_pdf, generate_complete_pdf, generate_charts_pdf
     )
 except ImportError as e:
     st.error(f"Error al importar módulos: {e}")
@@ -384,130 +384,139 @@ if analyze_button:
                     key='dl_detailed' # Key única
                 )
 
-                # --- Botones de Exportación PDF Andru.ia ---
-                st.markdown("---")
-                st.markdown("### 🤖 **Exportación PDF Profesional Andru.ia**")
+            # --- Descarga Consolidada ---
+            # <<< AÑADIDO >>> Sección de descarga de PDFs con estado persistente
+            st.markdown("---")
+            st.subheader("📥 Descarga de Reportes PDF")
 
-                # Crear columnas para los botones PDF
+            # Usar session_state para mantener el estado de los PDFs generados
+            if 'pdf_cache' not in st.session_state:
+                st.session_state.pdf_cache = {}
+
+            # Generar cache key único basado en los datos
+            cache_key = f"pdfs_{len(results_df)}_{hash(str(results_df.to_dict()))}"
+
+            # Solo regenerar PDFs si los datos han cambiado
+            if cache_key not in st.session_state.pdf_cache:
+                with st.spinner("🔄 Preparando reportes PDF..."):
+                    try:
+                        # Preparar datos comunes
+                        bloom_distribution = {}
+                        if 'Nivel Bloom Detectado' in results_df.columns:
+                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
+
+                        common_stats = {
+                            'total_rdas': len(results_df),
+                            'bloom_distribution': bloom_distribution,
+                            'avg_bloom_score': 0
+                        }
+
+                        # Generar todos los PDFs y guardarlos en cache
+                        st.session_state.pdf_cache[cache_key] = {
+                            'detailed': generate_detailed_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
+                            'executive': generate_executive_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
+                            'complete': generate_complete_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
+                            'charts': generate_charts_pdf(results_df.to_dict('records'), global_academic_level, common_stats)
+                        }
+
+                        # Generar PDFs por nivel
+                        for level in ['2', '4', '6', '8']:
+                            st.session_state.pdf_cache[cache_key][f'level_{level}'] = generate_level_pdf(
+                                results_df.to_dict('records'), level, common_stats
+                            )
+                    except Exception as e:
+                        st.error(f"Error al preparar PDFs: {str(e)}")
+                        st.session_state.pdf_cache[cache_key] = {}
+
+            # Mostrar botones de descarga (sin regenerar PDFs)
+            if cache_key in st.session_state.pdf_cache and st.session_state.pdf_cache[cache_key]:
                 col_pdf1, col_pdf2, col_pdf3, col_pdf4 = st.columns(4)
 
                 with col_pdf1:
-                    try:
-                        # Corregir nombres de columnas y cálculos
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
-
-                        pdf_data = generate_detailed_pdf(results_df.to_dict('records'), global_academic_level, {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0  # Simplificado por ahora
-                        })
-                        st.download_button(
-                            label="📄 PDF Detallado",
-                            data=pdf_data,
-                            file_name=f"Andru_Analisis_Detallado_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            help="Exportar análisis completo con todas las métricas",
-                            key="dl_pdf_detailed"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar PDF detallado: {str(e)}")
+                    st.download_button(
+                        label="📄 PDF Detallado",
+                        data=st.session_state.pdf_cache[cache_key].get('detailed', b''),
+                        file_name=f"Andru_Detallado_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Análisis básico con columnas esenciales",
+                        key="dl_pdf_detailed_cached"
+                    )
 
                 with col_pdf2:
-                    try:
-                        # Corregir nombres de columnas y cálculos
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
-
-                        pdf_data = generate_executive_pdf(results_df.to_dict('records'), global_academic_level, {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0  # Simplificado por ahora
-                        })
-                        st.download_button(
-                            label="📊 PDF Ejecutivo",
-                            data=pdf_data,
-                            file_name=f"Andru_Reporte_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            help="Resumen gerencial con métricas clave",
-                            key="dl_pdf_executive"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar PDF ejecutivo: {str(e)}")
+                    st.download_button(
+                        label="📊 PDF Ejecutivo",
+                        data=st.session_state.pdf_cache[cache_key].get('executive', b''),
+                        file_name=f"Andru_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Resumen gerencial con métricas clave",
+                        key="dl_pdf_executive_cached"
+                    )
 
                 with col_pdf3:
-                    # Selector de nivel para PDF por nivel
-                    selected_level = st.selectbox(
-                        "Nivel:",
-                        ['2', '4', '6', '8'],
-                        key="select_level_pdf",
-                        help="Seleccionar nivel académico para filtrar"
+                    st.download_button(
+                        label="📋 PDF Completo",
+                        data=st.session_state.pdf_cache[cache_key].get('complete', b''),
+                        file_name=f"Andru_Completo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Reporte integral con todas las columnas (horizontal)",
+                        key="dl_pdf_complete_cached"
                     )
-                    try:
-                        # Corregir nombres de columnas y cálculos
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
-
-                        pdf_data = generate_level_pdf(results_df.to_dict('records'), selected_level, {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0  # Simplificado por ahora
-                        })
-                        st.download_button(
-                            label=f"🎯 PDF Nivel {selected_level}",
-                            data=pdf_data,
-                            file_name=f"Andru_Nivel_{selected_level}_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            help=f"Análisis específico para nivel {selected_level}",
-                            key="dl_pdf_level"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar PDF por nivel: {str(e)}")
 
                 with col_pdf4:
-                    try:
-                        # Corregir nombres de columnas y cálculos
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
+                    st.download_button(
+                        label="📈 PDF con Gráficos",
+                        data=st.session_state.pdf_cache[cache_key].get('charts', b''),
+                        file_name=f"Andru_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Reporte con gráficos y análisis visual (horizontal)",
+                        key="dl_pdf_charts_cached"
+                    )
 
-                        pdf_data = generate_complete_pdf(results_df.to_dict('records'), global_academic_level, {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0  # Simplificado por ahora
-                        })
-                        st.download_button(
-                            label="📋 PDF Completo",
-                            data=pdf_data,
-                            file_name=f"Andru_Reporte_Completo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            help="Reporte integral con todos los análisis",
-                            key="dl_pdf_complete"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar PDF completo: {str(e)}")
+                # Segunda fila: PDFs por nivel
+                st.markdown("**📊 Reportes por Nivel Académico:**")
+                col_level1, col_level2, col_level3, col_level4 = st.columns(4)
 
-                # Información adicional sobre los PDFs
-                with st.expander("ℹ️ Información sobre los Reportes PDF"):
-                    st.markdown("""
-                    **📄 PDF Detallado**: Incluye tabla completa con todos los RdAs analizados, métricas detalladas y recomendaciones específicas.
+                with col_level1:
+                    st.download_button(
+                        label="🎯 Nivel 2",
+                        data=st.session_state.pdf_cache[cache_key].get('level_2', b''),
+                        file_name=f"Andru_Nivel2_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Análisis específico para nivel 2",
+                        key="dl_pdf_level2_cached"
+                    )
 
-                    **📊 PDF Ejecutivo**: Resumen gerencial con métricas clave, gráficos de distribución y recomendaciones estratégicas.
+                with col_level2:
+                    st.download_button(
+                        label="🎯 Nivel 4",
+                        data=st.session_state.pdf_cache[cache_key].get('level_4', b''),
+                        file_name=f"Andru_Nivel4_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Análisis específico para nivel 4",
+                        key="dl_pdf_level4_cached"
+                    )
 
-                    **🎯 PDF por Nivel**: Análisis filtrado por nivel académico específico (2, 4, 6, 8) con métricas contextualizadas.
+                with col_level3:
+                    st.download_button(
+                        label="🎯 Nivel 6",
+                        data=st.session_state.pdf_cache[cache_key].get('level_6', b''),
+                        file_name=f"Andru_Nivel6_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Análisis específico para nivel 6",
+                        key="dl_pdf_level6_cached"
+                    )
 
-                    **📋 PDF Completo**: Reporte integral que combina análisis detallado, resumen ejecutivo y recomendaciones comprensivas.
+                with col_level4:
+                    st.download_button(
+                        label="🎯 Nivel 8",
+                        data=st.session_state.pdf_cache[cache_key].get('level_8', b''),
+                        file_name=f"Andru_Nivel8_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                        mime="application/pdf",
+                        help="Análisis específico para nivel 8",
+                        key="dl_pdf_level8_cached"
+                    )
 
-                    *Todos los reportes incluyen branding profesional Andru.ia y están optimizados para impresión.*
-                    """)
-
-                st.markdown("---")
-
-
-            # --- Mostrar Resumen General ---
+            # --- Fin Descarga Consolidada Mejorada ---
             st.subheader("Resumen General")
 
             # --- Botón de Descarga para Resumen General Consolidado ---
@@ -577,36 +586,51 @@ if analyze_button:
                 col_summary_pdf1, col_summary_pdf2 = st.columns(2)
 
                 with col_summary_pdf1:
-                    if st.button("📊 PDF Resumen Ejecutivo", help="Resumen general con métricas agregadas", key="btn_summary_pdf_executive"):
-                        try:
-                            with st.spinner("Generando PDF resumen ejecutivo..."):
-                                pdf_data = generate_executive_pdf(results_df)
-                                st.download_button(
-                                    label="⬇️ Descargar PDF Resumen",
-                                    data=pdf_data,
-                                    file_name=f"Andru_Resumen_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                                    mime="application/pdf",
-                                    key="dl_summary_pdf_executive"
-                                )
-                                st.success("✅ PDF resumen ejecutivo generado")
-                        except Exception as e:
-                            st.error(f"Error al generar PDF resumen: {str(e)}")
+                    try:
+                        # Corregir: usar directamente st.download_button sin st.button
+                        bloom_distribution = {}
+                        if 'Nivel Bloom Detectado' in results_df.columns:
+                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
+
+                        pdf_data = generate_executive_pdf(results_df.to_dict('records'), global_academic_level, {
+                            'total_rdas': len(results_df),
+                            'bloom_distribution': bloom_distribution,
+                            'avg_bloom_score': 0
+                        })
+                        st.download_button(
+                            label="📊 PDF Resumen Ejecutivo",
+                            data=pdf_data,
+                            file_name=f"Andru_Resumen_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                            mime="application/pdf",
+                            help="Resumen general con métricas agregadas",
+                            key="dl_summary_pdf_executive"
+                        )
+                    except Exception as e:
+                        st.error(f"Error al generar PDF resumen ejecutivo: {str(e)}")
 
                 with col_summary_pdf2:
-                    if st.button("📈 PDF con Gráficos", help="Resumen con visualizaciones y distribuciones", key="btn_summary_pdf_charts"):
-                        try:
-                            with st.spinner("Generando PDF con gráficos..."):
-                                pdf_data = generate_complete_pdf(results_df)
-                                st.download_button(
-                                    label="⬇️ Descargar PDF Gráficos",
-                                    data=pdf_data,
-                                    file_name=f"Andru_Resumen_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                                    mime="application/pdf",
-                                    key="dl_summary_pdf_charts"
-                                )
-                                st.success("✅ PDF con gráficos generado")
-                        except Exception as e:
-                            st.error(f"Error al generar PDF con gráficos: {str(e)}")
+                    try:
+                        # Corregir: usar directamente st.download_button sin st.button
+                        bloom_distribution = {}
+                        if 'Nivel Bloom Detectado' in results_df.columns:
+                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
+
+                        # CORREGIDO: Usar generate_charts_pdf en lugar de generate_complete_pdf
+                        pdf_data = generate_charts_pdf(results_df.to_dict('records'), global_academic_level, {
+                            'total_rdas': len(results_df),
+                            'bloom_distribution': bloom_distribution,
+                            'avg_bloom_score': 0
+                        })
+                        st.download_button(
+                            label="📈 PDF con Gráficos",
+                            data=pdf_data,
+                            file_name=f"Andru_PDF_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                            mime="application/pdf",
+                            help="Reporte con gráficos, visualizaciones y análisis estadístico",
+                            key="dl_summary_pdf_charts"
+                        )
+                    except Exception as e:
+                        st.error(f"Error al generar PDF con gráficos: {str(e)}")
             # --- Fin Descarga Consolidada ---
 
 
