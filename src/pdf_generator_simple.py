@@ -65,6 +65,9 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
                 ax1.text(bar.get_x() + bar.get_width()/2., height,
                        f'{int(height)}', ha='center', va='bottom', fontweight='bold')
 
+            # Rotar etiquetas del eje X para mejor legibilidad
+            ax1.tick_params(axis='x', rotation=45)
+
             # GRÁFICO 2: Distribución por Nivel Académico
             level_counts = {}
             for item in data:
@@ -138,7 +141,7 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
                 ax.text(bar.get_x() + bar.get_width()/2., height + 0.05,
                        f'{avg:.2f}', ha='center', va='bottom', fontweight='bold', fontsize=11)
 
-            plt.xticks(rotation=0)
+            plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
 
             img_buffer2 = io.BytesIO()
@@ -246,7 +249,7 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos")
                 ax.text(bar.get_x() + bar.get_width()/2., height + height*0.02,
                        f'{avg:.2f}', ha='center', va='bottom', fontweight='bold', fontsize=11)
 
-            plt.xticks(rotation=15, ha='right')
+            plt.xticks(rotation=45, ha='right')
             plt.tight_layout()
 
             img_buffer4 = io.BytesIO()
