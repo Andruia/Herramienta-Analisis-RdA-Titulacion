@@ -210,13 +210,30 @@ else: # Método "Subir Archivo"
 # Botón para iniciar análisis en la barra lateral
 analyze_button = st.sidebar.button("Analizar RAs", type="primary")
 
+# <<< INDICADOR DE ESTADO >>> Mostrar estado actual del análisis
+if 'analysis_completed' in st.session_state and st.session_state.analysis_completed:
+    st.sidebar.success(f"✅ Análisis completado ({len(st.session_state.analysis_results)} RdAs)")
+    st.sidebar.info("💡 Los resultados se mantienen disponibles aunque uses los botones de descarga")
+elif 'analysis_completed' in st.session_state:
+    st.sidebar.info("📋 Listo para analizar")
+
 # --- Área Principal de Resultados ---
 st.header("Resultados del Análisis")
 
-# Definir results_df fuera del bloque 'if analyze_button' para que esté disponible para descarga
-results_df = pd.DataFrame()
+# <<< SOLUCIÓN UX >>> Implementar estado persistente para mantener resultados
+# Inicializar session_state para resultados
+if 'analysis_results' not in st.session_state:
+    st.session_state.analysis_results = pd.DataFrame()
+if 'analysis_completed' not in st.session_state:
+    st.session_state.analysis_completed = False
+if 'current_input_data' not in st.session_state:
+    st.session_state.current_input_data = []
 
-if analyze_button:
+# Verificar si los datos de entrada han cambiado
+input_data_changed = (st.session_state.current_input_data != input_data)
+
+# Si se presiona el botón de análisis O si hay datos nuevos, ejecutar análisis
+if analyze_button or (input_data_changed and input_data):
     if not input_data:
         st.warning("Por favor, ingrese o suba RdAs válidos y seleccione las columnas necesarias (si aplica) para analizar.")
     else:
@@ -301,286 +318,298 @@ if analyze_button:
                 progress_bar.progress((i + 1) / total_items)
 
         if results_list:
-            results_df = pd.DataFrame(results_list)
+            st.session_state.analysis_results = pd.DataFrame(results_list)
+            st.session_state.analysis_completed = True
+            st.session_state.current_input_data = input_data
+            st.success(f"✅ Análisis completado exitosamente para {len(results_list)} RdAs.")
+        else:
+            st.session_state.analysis_results = pd.DataFrame()
+            st.session_state.analysis_completed = False
+            st.session_state.current_input_data = input_data
+            st.warning("⚠️ No se pudieron procesar los RdAs. Verifique el formato de entrada.")
 
-            # --- Mostrar Tabla de Resultados Detallados ---
-            st.subheader("Análisis Detallado por RdA")
-            # <<< MODIFICADO >>> Añadir nuevas columnas de Conocimiento
-            display_columns = {
-                "RdA": "Resultado de Aprendizaje",
-                "Nivel Académico Origen": "Nivel Origen",
-                "Verbo Principal": "Verbo",
-                "Nivel Bloom Detectado": "Nivel Bloom (Proceso)", # Aclarar que es Proceso
-                "Clasificación vs Nivel Origen": "Adecuación T.",
-                "Puntaje Observable": "Obs.",
-                "Puntaje Medible": "Med.",
-                "Puntaje Evaluable": "Eval.",
-                "Puntaje Corrección": "Corr.",
-                "Autenticidad Acción": "Aut. Acción",
-                "Autenticidad Contexto": "Aut. Contexto",
-                "Autenticidad Sentido": "Aut. Sentido",
-                "Conocimiento Factual": "K.Fact",        # <<< AÑADIDO >>>
-                "Conocimiento Conceptual": "K.Conc",     # <<< AÑADIDO >>>
-                "Conocimiento Procedimental": "K.Proc",  # <<< AÑADIDO >>>
-                "Conocimiento Metacognitivo": "K.Meta",  # <<< AÑADIDO >>>
-            }
-            # Reordenar columnas <<< MODIFICADO >>>
-            display_order = [
-                "RA",
-                "Nivel Académico Origen",
-                "Verbo Principal",
-                "Nivel Bloom Detectado", # Proceso Cognitivo
-                "Conocimiento Factual",        # <<< AÑADIDO >>>
-                "Conocimiento Conceptual",     # <<< AÑADIDO >>>
-                "Conocimiento Procedimental",  # <<< AÑADIDO >>>
-                "Conocimiento Metacognitivo",  # <<< AÑADIDO >>>
-                "Clasificación vs Nivel Origen",
-                "Puntaje Observable",
-                "Puntaje Medible",
-                "Puntaje Evaluable",
-                "Puntaje Corrección",
-                "Autenticidad Acción",
-                "Autenticidad Contexto",
-                "Autenticidad Sentido",
-            ]
-            existing_display_order = [col for col in display_order if col in results_df.columns]
-            st.dataframe(
-                results_df[existing_display_order].rename(columns=display_columns),
-                use_container_width=True,
-                column_config={ # <<< MODIFICADO >>> Añadir ayuda para las nuevas columnas
-                     "Corr.": st.column_config.NumberColumn(help="Corrección (0-3): Claridad y completitud."),
-                     "Aut. Acción": st.column_config.NumberColumn(format="%d ⭐", help="Autenticidad - Acción (1-5)"),
-                     "Aut. Contexto": st.column_config.NumberColumn(format="%d ⭐", help="Autenticidad - Contexto (1-5)"),
-                     "Aut. Sentido": st.column_config.NumberColumn(format="%d ⭐", help="Autenticidad - Sentido (1-5)"),
-                     "K.Fact": st.column_config.NumberColumn(format="%d", help="Conocimiento Factual (1=Bajo, 2=Medio, 3=Alto)"),
-                     "K.Conc": st.column_config.NumberColumn(format="%d", help="Conocimiento Conceptual (1=Bajo, 2=Medio, 3=Alto)"),
-                     "K.Proc": st.column_config.NumberColumn(format="%d", help="Conocimiento Procedimental (1=Bajo, 2=Medio, 3=Alto)"),
-                     "K.Meta": st.column_config.NumberColumn(format="%d", help="Conocimiento Metacognitivo (1=Bajo, 2=Medio, 3=Alto)"),
-                 }
+# Usar results almacenados en session_state para mostrar resultado
+results_df = st.session_state.analysis_results
+
+if st.session_state.analysis_completed and not results_df.empty:
+
+    # --- Mostrar Tabla de Resultados Detallados ---
+    st.subheader("Análisis Detallado por RdA")
+    # <<< MODIFICADO >>> Añadir nuevas columnas de Conocimiento
+    display_columns = {
+        "RdA": "Resultado de Aprendizaje",
+        "Nivel Académico Origen": "Nivel Origen",
+        "Verbo Principal": "Verbo",
+        "Nivel Bloom Detectado": "Nivel Bloom (Proceso)", # Aclarar que es Proceso
+        "Clasificación vs Nivel Origen": "Adecuación T.",
+        "Puntaje Observable": "Obs.",
+        "Puntaje Medible": "Med.",
+        "Puntaje Evaluable": "Eval.",
+        "Puntaje Corrección": "Corr.",
+        "Autenticidad Acción": "Aut. Acción",
+        "Autenticidad Contexto": "Aut. Contexto",
+        "Autenticidad Sentido": "Aut. Sentido",
+        "Conocimiento Factual": "K.Fact",        # <<< AÑADIDO >>>
+        "Conocimiento Conceptual": "K.Conc",     # <<< AÑADIDO >>>
+        "Conocimiento Procedimental": "K.Proc",  # <<< AÑADIDO >>>
+        "Conocimiento Metacognitivo": "K.Meta",  # <<< AÑADIDO >>>
+    }
+    # Reordenar columnas <<< MODIFICADO >>>
+    display_order = [
+        "RA",
+        "Nivel Académico Origen",
+        "Verbo Principal",
+        "Nivel Bloom Detectado", # Proceso Cognitivo
+        "Conocimiento Factual",        # <<< AÑADIDO >>>
+        "Conocimiento Conceptual",     # <<< AÑADIDO >>>
+        "Conocimiento Procedimental",  # <<< AÑADIDO >>>
+        "Conocimiento Metacognitivo",  # <<< AÑADIDO >>>
+        "Clasificación vs Nivel Origen",
+        "Puntaje Observable",
+        "Puntaje Medible",
+        "Puntaje Evaluable",
+        "Puntaje Corrección",
+        "Autenticidad Acción",
+        "Autenticidad Contexto",
+        "Autenticidad Sentido",
+    ]
+    existing_display_order = [col for col in display_order if col in results_df.columns]
+    st.dataframe(
+        results_df[existing_display_order].rename(columns=display_columns),
+        use_container_width=True,
+        column_config={ # <<< MODIFICADO >>> Añadir ayuda para las nuevas columnas
+             "Corr.": st.column_config.NumberColumn(help="Corrección (0-3): Claridad y completitud."),
+             "Aut. Acción": st.column_config.NumberColumn(format="%d ⭐", help="Autenticidad - Acción (1-5)"),
+             "Aut. Contexto": st.column_config.NumberColumn(format="%d ⭐", help="Autenticidad - Contexto (1-5)"),
+             "Aut. Sentido": st.column_config.NumberColumn(format="%d ⭐", help="Autenticidad - Sentido (1-5)"),
+             "K.Fact": st.column_config.NumberColumn(format="%d", help="Conocimiento Factual (1=Bajo, 2=Medio, 3=Alto)"),
+             "K.Conc": st.column_config.NumberColumn(format="%d", help="Conocimiento Conceptual (1=Bajo, 2=Medio, 3=Alto)"),
+             "K.Proc": st.column_config.NumberColumn(format="%d", help="Conocimiento Procedimental (1=Bajo, 2=Medio, 3=Alto)"),
+             "K.Meta": st.column_config.NumberColumn(format="%d", help="Conocimiento Metacognitivo (1=Bajo, 2=Medio, 3=Alto)"),
+         }
+    )
+
+    # --- Botón de Descarga para Tabla Detallada ---
+    if not results_df.empty:
+        @st.cache_data
+        def convert_df_to_excel_detailed(df):
+            output = io.BytesIO()
+            with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                # Descargar las columnas mostradas con nombres amigables
+                # <<< MODIFICADO >>> Asegurarse que existing_display_order y display_columns están actualizados
+                df_to_download = df[existing_display_order].rename(columns=display_columns)
+                # O descargar todas las columnas originales si se prefiere:
+                # df_to_download = df # Incluiría notas y errores
+                df_to_download.to_excel(writer, index=False, sheet_name='Analisis_Detallado')
+            processed_data = output.getvalue()
+            return processed_data
+
+        excel_bytes_detailed = convert_df_to_excel_detailed(results_df)
+
+        st.download_button(
+            label="📥 Descargar Análisis Detallado (.xlsx)",
+            data=excel_bytes_detailed,
+            file_name='analisis_detallado_ras.xlsx',
+            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            key='dl_detailed' # Key única
+        )
+
+        # --- Descarga Consolidada ---
+        st.markdown("---")
+        st.subheader("📥 Descarga de Reportes PDF")
+
+        # Usar session_state para mantener el estado de los PDFs generados
+        if 'pdf_cache' not in st.session_state:
+            st.session_state.pdf_cache = {}
+
+        # Generar cache key único basado en los datos
+        cache_key = f"pdfs_{len(results_df)}_{hash(str(results_df.to_dict()))}"
+
+        # Solo regenerar PDFs si los datos han cambiado
+        if cache_key not in st.session_state.pdf_cache:
+            with st.spinner("🔄 Preparando reportes PDF..."):
+                try:
+                    # Preparar datos comunes
+                    bloom_distribution = {}
+                    if 'Nivel Bloom Detectado' in results_df.columns:
+                        bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
+
+                    common_stats = {
+                        'total_rdas': len(results_df),
+                        'bloom_distribution': bloom_distribution,
+                        'avg_bloom_score': 0
+                    }
+
+                    # Generar PDFs optimizados (sin PDF detallado)
+                    st.session_state.pdf_cache[cache_key] = {
+                        'executive': generate_executive_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
+                        'complete': generate_complete_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
+                        'charts': generate_charts_pdf(results_df.to_dict('records'), global_academic_level, common_stats)
+                    }
+
+                    # Generar PDFs por nivel
+                    for level in ['2', '4', '6', '8']:
+                        st.session_state.pdf_cache[cache_key][f'level_{level}'] = generate_level_pdf(
+                            results_df.to_dict('records'), level, common_stats
+                        )
+                except Exception as e:
+                    st.error(f"Error al preparar PDFs: {str(e)}")
+                    st.session_state.pdf_cache[cache_key] = {}
+
+        # Mostrar botones de descarga principales (sin regenerar PDFs)
+        if cache_key in st.session_state.pdf_cache and st.session_state.pdf_cache[cache_key]:
+
+            # === REPORTES PRINCIPALES ===
+            st.markdown("**📊 Reportes Principales:**")
+            col_pdf1, col_pdf2, col_pdf3 = st.columns(3)
+
+            with col_pdf1:
+                st.download_button(
+                    label="📊 PDF Ejecutivo",
+                    data=st.session_state.pdf_cache[cache_key].get('executive', b''),
+                    file_name=f"Andru_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                    mime="application/pdf",
+                    help="📋 Resumen gerencial con 6 columnas esenciales (vertical)",
+                    key="dl_pdf_executive_cached"
+                )
+
+            with col_pdf2:
+                st.download_button(
+                    label="📋 PDF Completo",
+                    data=st.session_state.pdf_cache[cache_key].get('complete', b''),
+                    file_name=f"Andru_Completo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                    mime="application/pdf",
+                    help="📊 Análisis integral con 15 columnas completas (horizontal)",
+                    key="dl_pdf_complete_cached"
+                )
+
+            with col_pdf3:
+                st.download_button(
+                    label="📈 PDF Solo Gráficos",
+                    data=st.session_state.pdf_cache[cache_key].get('charts', b''),
+                    file_name=f"Andru_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                    mime="application/pdf",
+                    help="📈 5 páginas con SOLO gráficos y análisis visual (sin tablas)",
+                    key="dl_pdf_charts_cached"
+                )
+
+        st.markdown("---")
+
+        # === REPORTES POR NIVEL ACADÉMICO ===
+        st.markdown("**🎯 Reportes por Nivel Académico:**")
+
+    # Selector de nivel
+    selected_levels = st.multiselect(
+        "Seleccionar Niveles Académicos:",
+        options=['2', '4', '6', '8'],
+        default=['2', '4', '6', '8'],
+        help="Selecciona uno o varios niveles para generar PDFs específicos"
+    )
+
+    # Mostrar botones de descarga por nivel seleccionado
+    if selected_levels:
+        cols_levels = st.columns(len(selected_levels))
+
+        for i, level in enumerate(selected_levels):
+            with cols_levels[i]:
+                st.download_button(
+                    label=f"🎯 Nivel {level}",
+                    data=st.session_state.pdf_cache[cache_key].get(f'level_{level}', b''),
+                    file_name=f"Andru_Nivel{level}_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                    mime="application/pdf",
+                    help=f"Análisis completo filtrado para nivel académico {level}",
+                    key=f"dl_pdf_level{level}_cached"
+                )
+
+        # === INFORMACIÓN SOBRE LOS REPORTES ===
+        with st.expander("ℹ️ Información sobre los Reportes PDF"):
+            st.markdown("""
+            ### 📊 **PDF Ejecutivo** (Vertical)
+            - **Columnas**: RdA, Nivel Bloom, Observable, Medible, Evaluable, Corrección
+            - **Uso**: Resumen gerencial rápido y presentaciones ejecutivas
+            - **Formato**: A4 vertical, tabla compacta
+
+            ### 📋 **PDF Completo** (Horizontal)
+            - **Columnas**: 15 columnas completas con toda la información
+            - **Incluye**: Verbo, Adecuación, Autenticidad, Conocimiento, etc.
+            - **Formato**: A4 horizontal para máximo aprovechamiento del espacio
+            - **Uso**: Análisis detallado y documentación completa
+
+            ### 📈 **PDF Solo Gráficos** (Horizontal)
+            - **Contenido**: 5 páginas con SOLO visualizaciones (sin tablas)
+            - **Gráficos**: Distribuciones, Verificabilidad, Autenticidad, Conocimiento, Comparación
+            - **Formato**: A4 horizontal, gráficos de alta calidad
+            - **Uso**: Presentaciones visuales y análisis estadístico
+
+            ### 🎯 **PDFs por Nivel**
+            - **Contenido**: Tabla completa filtrada por nivel académico específico
+            - **Formato**: A4 horizontal con 15 columnas
+            - **Uso**: Análisis específico por nivel de formación
+            """)
+
+        # --- Fin Descarga Consolidada Mejorada ---
+        st.subheader("Resumen General")
+
+        # --- Botón de Descarga para Resumen General Consolidado ---
+        if not results_df.empty:
+            @st.cache_data
+            def convert_summaries_to_excel(df_results):
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    # Hoja 1: Frecuencia Nivel Bloom (Proceso)
+                    level_counts = df_results['Nivel Bloom Original'].value_counts().sort_index()
+                    formatted_labels = [f"{lvl} ({LEVEL_TO_NUMBER.get(lvl.lower(), '')})" if LEVEL_TO_NUMBER.get(lvl.lower()) else lvl for lvl in level_counts.index]
+                    freq_df_bloom = pd.DataFrame({'Nivel_Proceso': formatted_labels, 'Frecuencia': level_counts.values})
+                    if not freq_df_bloom.empty: freq_df_bloom.to_excel(writer, index=False, sheet_name='Frecuencia_Bloom_Proceso')
+
+                    # <<< AÑADIDO >>> Hoja 2: Promedios Dimensión Conocimiento
+                    avg_scores_know = df_results[[
+                        "Conocimiento Factual", "Conocimiento Conceptual",
+                        "Conocimiento Procedimental", "Conocimiento Metacognitivo"
+                    ]].mean().round(2).reset_index()
+                    avg_scores_know.columns = ['Dimensión Conocimiento', 'Promedio (1-3)']
+                    avg_scores_know['Dimensión Conocimiento'] = avg_scores_know['Dimensión Conocimiento'].replace({
+                        "Conocimiento Factual": "Factual", "Conocimiento Conceptual": "Conceptual",
+                        "Conocimiento Procedimental": "Procedimental", "Conocimiento Metacognitivo": "Metacognitivo"
+                    })
+                    if not avg_scores_know.empty: avg_scores_know.to_excel(writer, index=False, sheet_name='Promedios_Conocimiento')
+
+                    # Hoja 3: Frecuencia Adecuación
+                    adequacy_counts = df_results['Clasificación vs Nivel Origen'].value_counts().reset_index()
+                    adequacy_counts.columns = ['Clasificación', 'Frecuencia']
+                    if not adequacy_counts.empty: adequacy_counts.to_excel(writer, index=False, sheet_name='Frecuencia_Adecuacion')
+
+                    # Hoja 4: Promedios Verificabilidad
+                    avg_scores_verif = df_results[["Puntaje Observable", "Puntaje Medible", "Puntaje Evaluable"]].mean().round(2).reset_index()
+                    avg_scores_verif.columns = ['Métrica', 'Promedio']
+                    avg_scores_verif['Métrica'] = avg_scores_verif['Métrica'].replace({"Puntaje Observable": "Observable", "Puntaje Medible": "Medible", "Puntaje Evaluable": "Evaluable"})
+                    if not avg_scores_verif.empty: avg_scores_verif.to_excel(writer, index=False, sheet_name='Promedios_Verificabilidad')
+
+                    # Hoja 5 y 6: Corrección
+                    avg_corr_val = df_results["Puntaje Corrección"].mean().round(2)
+                    corr_freq = df_results["Puntaje Corrección"].value_counts().sort_index().reset_index()
+                    corr_freq.columns = ['Puntaje', 'Frecuencia']
+                    avg_corr_df = pd.DataFrame({'Métrica': ['Promedio Corrección (0-3)'], 'Valor': [f"{avg_corr_val:.2f}"]})
+                    if not avg_corr_df.empty: avg_corr_df.to_excel(writer, index=False, sheet_name='Promedio_Correccion')
+                    if not corr_freq.empty: corr_freq.to_excel(writer, index=False, sheet_name='Frecuencia_Correccion')
+
+                    # Hoja 7: Promedios Autenticidad
+                    avg_scores_auth = df_results[["Autenticidad Acción", "Autenticidad Contexto", "Autenticidad Sentido"]].mean().round(2).reset_index()
+                    avg_scores_auth.columns = ['Métrica', 'Promedio']
+                    avg_scores_auth['Métrica'] = avg_scores_auth['Métrica'].replace({"Autenticidad Acción": "Acción", "Autenticidad Contexto": "Contexto", "Autenticidad Sentido": "Sentido"})
+                    if not avg_scores_auth.empty: avg_scores_auth.to_excel(writer, index=False, sheet_name='Promedios_Autenticidad')
+
+                processed_data = output.getvalue()
+                return processed_data
+
+            excel_bytes_summary = convert_summaries_to_excel(results_df)
+            st.download_button(
+                label="📥 Descargar Resumen General (.xlsx)",
+                data=excel_bytes_summary,
+                file_name='resumen_general_ras.xlsx',
+                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                key='download_summary'
             )
-
-            # --- Botón de Descarga para Tabla Detallada ---
-            if not results_df.empty:
-                @st.cache_data
-                def convert_df_to_excel_detailed(df):
-                    output = io.BytesIO()
-                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                        # Descargar las columnas mostradas con nombres amigables
-                        # <<< MODIFICADO >>> Asegurarse que existing_display_order y display_columns están actualizados
-                        df_to_download = df[existing_display_order].rename(columns=display_columns)
-                        # O descargar todas las columnas originales si se prefiere:
-                        # df_to_download = df # Incluiría notas y errores
-                        df_to_download.to_excel(writer, index=False, sheet_name='Analisis_Detallado')
-                    processed_data = output.getvalue()
-                    return processed_data
-
-                excel_bytes_detailed = convert_df_to_excel_detailed(results_df)
-
-                st.download_button(
-                    label="📥 Descargar Análisis Detallado (.xlsx)",
-                    data=excel_bytes_detailed,
-                    file_name='analisis_detallado_ras.xlsx',
-                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    key='dl_detailed' # Key única
-                )
-
-            # --- Descarga Consolidada ---
-            # <<< AÑADIDO >>> Sección de descarga de PDFs con estado persistente
-            st.markdown("---")
-            st.subheader("📥 Descarga de Reportes PDF")
-
-            # Usar session_state para mantener el estado de los PDFs generados
-            if 'pdf_cache' not in st.session_state:
-                st.session_state.pdf_cache = {}
-
-            # Generar cache key único basado en los datos
-            cache_key = f"pdfs_{len(results_df)}_{hash(str(results_df.to_dict()))}"
-
-            # Solo regenerar PDFs si los datos han cambiado
-            if cache_key not in st.session_state.pdf_cache:
-                with st.spinner("🔄 Preparando reportes PDF..."):
-                    try:
-                        # Preparar datos comunes
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
-
-                        common_stats = {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0
-                        }
-
-                        # Generar PDFs optimizados (sin PDF detallado)
-                        st.session_state.pdf_cache[cache_key] = {
-                            'executive': generate_executive_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
-                            'complete': generate_complete_pdf(results_df.to_dict('records'), global_academic_level, common_stats),
-                            'charts': generate_charts_pdf(results_df.to_dict('records'), global_academic_level, common_stats)
-                        }
-
-                        # Generar PDFs por nivel
-                        for level in ['2', '4', '6', '8']:
-                            st.session_state.pdf_cache[cache_key][f'level_{level}'] = generate_level_pdf(
-                                results_df.to_dict('records'), level, common_stats
-                            )
-                    except Exception as e:
-                        st.error(f"Error al preparar PDFs: {str(e)}")
-                        st.session_state.pdf_cache[cache_key] = {}
-
-            # Mostrar botones de descarga principales (sin regenerar PDFs)
-            if cache_key in st.session_state.pdf_cache and st.session_state.pdf_cache[cache_key]:
-
-                # === REPORTES PRINCIPALES ===
-                st.markdown("**📊 Reportes Principales:**")
-                col_pdf1, col_pdf2, col_pdf3 = st.columns(3)
-
-                with col_pdf1:
-                    st.download_button(
-                        label="📊 PDF Ejecutivo",
-                        data=st.session_state.pdf_cache[cache_key].get('executive', b''),
-                        file_name=f"Andru_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="📋 Resumen gerencial con 6 columnas esenciales (vertical)",
-                        key="dl_pdf_executive_cached"
-                    )
-
-                with col_pdf2:
-                    st.download_button(
-                        label="📋 PDF Completo",
-                        data=st.session_state.pdf_cache[cache_key].get('complete', b''),
-                        file_name=f"Andru_Completo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="📊 Análisis integral con 15 columnas completas (horizontal)",
-                        key="dl_pdf_complete_cached"
-                    )
-
-                with col_pdf3:
-                    st.download_button(
-                        label="📈 PDF Solo Gráficos",
-                        data=st.session_state.pdf_cache[cache_key].get('charts', b''),
-                        file_name=f"Andru_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                        mime="application/pdf",
-                        help="📈 5 páginas con SOLO gráficos y análisis visual (sin tablas)",
-                        key="dl_pdf_charts_cached"
-                    )
-
-                st.markdown("---")
-
-                # === REPORTES POR NIVEL ACADÉMICO ===
-                st.markdown("**🎯 Reportes por Nivel Académico:**")
-
-                # Selector de nivel
-                selected_levels = st.multiselect(
-                    "Seleccionar Niveles Académicos:",
-                    options=['2', '4', '6', '8'],
-                    default=['2', '4', '6', '8'],
-                    help="Selecciona uno o varios niveles para generar PDFs específicos"
-                )
-
-                # Mostrar botones de descarga por nivel seleccionado
-                if selected_levels:
-                    cols_levels = st.columns(len(selected_levels))
-
-                    for i, level in enumerate(selected_levels):
-                        with cols_levels[i]:
-                            st.download_button(
-                                label=f"🎯 Nivel {level}",
-                                data=st.session_state.pdf_cache[cache_key].get(f'level_{level}', b''),
-                                file_name=f"Andru_Nivel{level}_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                                mime="application/pdf",
-                                help=f"Análisis completo filtrado para nivel académico {level}",
-                                key=f"dl_pdf_level{level}_cached"
-                            )
-
-                # === INFORMACIÓN SOBRE LOS REPORTES ===
-                with st.expander("ℹ️ Información sobre los Reportes PDF"):
-                    st.markdown("""
-                    ### 📊 **PDF Ejecutivo** (Vertical)
-                    - **Columnas**: RdA, Nivel Bloom, Observable, Medible, Evaluable, Corrección
-                    - **Uso**: Resumen gerencial rápido y presentaciones ejecutivas
-                    - **Formato**: A4 vertical, tabla compacta
-
-                    ### 📋 **PDF Completo** (Horizontal)
-                    - **Columnas**: 15 columnas completas con toda la información
-                    - **Incluye**: Verbo, Adecuación, Autenticidad, Conocimiento, etc.
-                    - **Formato**: A4 horizontal para máximo aprovechamiento del espacio
-                    - **Uso**: Análisis detallado y documentación completa
-
-                    ### 📈 **PDF Solo Gráficos** (Horizontal)
-                    - **Contenido**: 5 páginas con SOLO visualizaciones (sin tablas)
-                    - **Gráficos**: Distribuciones, Verificabilidad, Autenticidad, Conocimiento, Comparación
-                    - **Formato**: A4 horizontal, gráficos de alta calidad
-                    - **Uso**: Presentaciones visuales y análisis estadístico
-
-                    ### 🎯 **PDFs por Nivel**
-                    - **Contenido**: Tabla completa filtrada por nivel académico específico
-                    - **Formato**: A4 horizontal con 15 columnas
-                    - **Uso**: Análisis específico por nivel de formación
-                    """)
-
-            # --- Fin Descarga Consolidada Mejorada ---
-            st.subheader("Resumen General")
-
-            # --- Botón de Descarga para Resumen General Consolidado ---
-            if not results_df.empty:
-                @st.cache_data
-                def convert_summaries_to_excel(df_results):
-                    output = io.BytesIO()
-                    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-                        # Hoja 1: Frecuencia Nivel Bloom (Proceso)
-                        level_counts = df_results['Nivel Bloom Original'].value_counts().sort_index()
-                        formatted_labels = [f"{lvl} ({LEVEL_TO_NUMBER.get(lvl.lower(), '')})" if LEVEL_TO_NUMBER.get(lvl.lower()) else lvl for lvl in level_counts.index]
-                        freq_df_bloom = pd.DataFrame({'Nivel_Proceso': formatted_labels, 'Frecuencia': level_counts.values})
-                        if not freq_df_bloom.empty: freq_df_bloom.to_excel(writer, index=False, sheet_name='Frecuencia_Bloom_Proceso')
-
-                        # <<< AÑADIDO >>> Hoja 2: Promedios Dimensión Conocimiento
-                        avg_scores_know = df_results[[
-                            "Conocimiento Factual", "Conocimiento Conceptual",
-                            "Conocimiento Procedimental", "Conocimiento Metacognitivo"
-                        ]].mean().round(2).reset_index()
-                        avg_scores_know.columns = ['Dimensión Conocimiento', 'Promedio (1-3)']
-                        avg_scores_know['Dimensión Conocimiento'] = avg_scores_know['Dimensión Conocimiento'].replace({
-                            "Conocimiento Factual": "Factual", "Conocimiento Conceptual": "Conceptual",
-                            "Conocimiento Procedimental": "Procedimental", "Conocimiento Metacognitivo": "Metacognitivo"
-                        })
-                        if not avg_scores_know.empty: avg_scores_know.to_excel(writer, index=False, sheet_name='Promedios_Conocimiento')
-
-                        # Hoja 3: Frecuencia Adecuación
-                        adequacy_counts = df_results['Clasificación vs Nivel Origen'].value_counts().reset_index()
-                        adequacy_counts.columns = ['Clasificación', 'Frecuencia']
-                        if not adequacy_counts.empty: adequacy_counts.to_excel(writer, index=False, sheet_name='Frecuencia_Adecuacion')
-
-                        # Hoja 4: Promedios Verificabilidad
-                        avg_scores_verif = df_results[["Puntaje Observable", "Puntaje Medible", "Puntaje Evaluable"]].mean().round(2).reset_index()
-                        avg_scores_verif.columns = ['Métrica', 'Promedio']
-                        avg_scores_verif['Métrica'] = avg_scores_verif['Métrica'].replace({"Puntaje Observable": "Observable", "Puntaje Medible": "Medible", "Puntaje Evaluable": "Evaluable"})
-                        if not avg_scores_verif.empty: avg_scores_verif.to_excel(writer, index=False, sheet_name='Promedios_Verificabilidad')
-
-                        # Hoja 5 y 6: Corrección
-                        avg_corr_val = df_results["Puntaje Corrección"].mean().round(2)
-                        corr_freq = df_results["Puntaje Corrección"].value_counts().sort_index().reset_index()
-                        corr_freq.columns = ['Puntaje', 'Frecuencia']
-                        avg_corr_df = pd.DataFrame({'Métrica': ['Promedio Corrección (0-3)'], 'Valor': [f"{avg_corr_val:.2f}"]})
-                        if not avg_corr_df.empty: avg_corr_df.to_excel(writer, index=False, sheet_name='Promedio_Correccion')
-                        if not corr_freq.empty: corr_freq.to_excel(writer, index=False, sheet_name='Frecuencia_Correccion')
-
-                        # Hoja 7: Promedios Autenticidad
-                        avg_scores_auth = df_results[["Autenticidad Acción", "Autenticidad Contexto", "Autenticidad Sentido"]].mean().round(2).reset_index()
-                        avg_scores_auth.columns = ['Métrica', 'Promedio']
-                        avg_scores_auth['Métrica'] = avg_scores_auth['Métrica'].replace({"Autenticidad Acción": "Acción", "Autenticidad Contexto": "Contexto", "Autenticidad Sentido": "Sentido"})
-                        if not avg_scores_auth.empty: avg_scores_auth.to_excel(writer, index=False, sheet_name='Promedios_Autenticidad')
-
-                    processed_data = output.getvalue()
-                    return processed_data
-
-                excel_bytes_summary = convert_summaries_to_excel(results_df)
-                st.download_button(
-                    label="📥 Descargar Resumen General (.xlsx)",
-                    data=excel_bytes_summary,
-                    file_name='resumen_general_ras.xlsx',
-                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                    key='download_summary'
-                )
 
             # --- Mostrar Resúmenes en Columnas ---
             # <<< MODIFICADO >>> Usar 6 columnas para incluir Conocimiento
@@ -726,8 +755,11 @@ if analyze_button:
 
 
         else:
-            if analyze_button:
-                st.info("No se generaron resultados para los RdAs proporcionados.")
+    # No hay análisis completado o no hay resultados
+    if not st.session_state.analysis_completed:
+        st.info("👆 **Sube un archivo o ingresa texto en la barra lateral y presiona 'Analizar RAs' para comenzar.**")
+    else:
+        st.info("No se generaron resultados para los RdAs proporcionados.")
 
 # --- Fin del Script ---
 
