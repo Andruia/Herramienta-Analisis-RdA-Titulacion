@@ -66,7 +66,7 @@ def create_pure_charts_pdf(data, title="📈 Análisis Visual de RdAs"):
                        f'{int(height)}', ha='center', va='bottom', fontweight='bold')
 
             # Rotar etiquetas del eje X para mejor legibilidad
-            ax1.tick_params(axis='x', rotation=45)
+            ax1.tick_params(axis='x', rotation=35)
 
             # GRÁFICO 2: Distribución por Nivel Académico
             level_counts = {}

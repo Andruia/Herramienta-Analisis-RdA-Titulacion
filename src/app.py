@@ -68,7 +68,7 @@ else:
     logging.info("Recursos NLP cargados correctamente en app.py.")
 
 # --- Interfaz de Usuario ---
-st.title("Analizador de Resultados de Aprendizaje (RdA)")
+st.title("Evaluador de Resultados de Aprendizaje (Eval_RdA)")
 st.markdown("Análisis basado en Taxonomía de Bloom Revisada y Criterios de Calidad")
 
 # --- Opciones en la Barra Lateral ---
@@ -229,11 +229,8 @@ if 'analysis_completed' not in st.session_state:
 if 'current_input_data' not in st.session_state:
     st.session_state.current_input_data = []
 
-# Verificar si los datos de entrada han cambiado
-input_data_changed = (st.session_state.current_input_data != input_data)
-
-# Si se presiona el botón de análisis O si hay datos nuevos, ejecutar análisis
-if analyze_button or (input_data_changed and input_data):
+# Si se presiona el botón de análisis, ejecutar análisis
+if analyze_button:
     if not input_data:
         st.warning("Por favor, ingrese o suba RdAs válidos y seleccione las columnas necesarias (si aplica) para analizar.")
     else:
