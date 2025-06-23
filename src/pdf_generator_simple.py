@@ -15,7 +15,7 @@ matplotlib.use('Agg')  # Backend sin GUI
 import numpy as np
 from collections import Counter
 
-def create_pure_charts_pdf(data, title="📈 Análisis Visual - Solo Gráficos"):
+def create_pure_charts_pdf(data, title="📈 Análisis Visual de RdAs"):
     """Crea un PDF con SOLO gráficos y visualizaciones (sin tablas)"""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(A4), leftMargin=30, rightMargin=30)
