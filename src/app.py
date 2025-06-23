@@ -755,11 +755,11 @@ if st.session_state.analysis_completed and not results_df.empty:
 
 
         else:
-    # No hay análisis completado o no hay resultados
-    if not st.session_state.analysis_completed:
-        st.info("👆 **Sube un archivo o ingresa texto en la barra lateral y presiona 'Analizar RAs' para comenzar.**")
-    else:
-        st.info("No se generaron resultados para los RdAs proporcionados.")
+            # No hay análisis completado o no hay resultados
+            if not st.session_state.analysis_completed:
+                st.info("👆 **Sube un archivo o ingresa texto en la barra lateral y presiona 'Analizar RAs' para comenzar.**")
+            else:
+                st.info("No se generaron resultados para los RdAs proporcionados.")
 
 # --- Fin del Script ---
 
