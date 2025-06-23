@@ -387,33 +387,6 @@ if analyze_button:
             # --- Descarga Consolidada ---
             # <<< AÑADIDO >>> Sección de descarga de PDFs con estado persistente
             st.markdown("---")
-
-            # === INFORMACIÓN SOBRE LOS REPORTES ===
-            with st.expander("ℹ️ Información sobre los Reportes PDF"):
-                st.markdown("""
-                ### 📊 **PDF Ejecutivo** (Vertical)
-                - **Columnas**: RdA, Nivel Bloom, Observable, Medible, Evaluable, Corrección
-                - **Uso**: Resumen gerencial rápido y presentaciones ejecutivas
-                - **Formato**: A4 vertical, tabla compacta
-
-                ### 📋 **PDF Completo** (Horizontal)
-                - **Columnas**: 15 columnas completas con toda la información
-                - **Incluye**: Verbo, Adecuación, Autenticidad, Conocimiento, etc.
-                - **Formato**: A4 horizontal para máximo aprovechamiento del espacio
-                - **Uso**: Análisis detallado y documentación completa
-
-                ### 📈 **PDF Solo Gráficos** (Horizontal)
-                - **Contenido**: 5 páginas con SOLO visualizaciones (sin tablas)
-                - **Gráficos**: Distribuciones, Verificabilidad, Autenticidad, Conocimiento, Comparación
-                - **Formato**: A4 horizontal, gráficos de alta calidad
-                - **Uso**: Presentaciones visuales y análisis estadístico
-
-                ### 🎯 **PDFs por Nivel**
-                - **Contenido**: Tabla completa filtrada por nivel académico específico
-                - **Formato**: A4 horizontal con 15 columnas
-                - **Uso**: Análisis específico por nivel de formación
-                """)
-
             st.subheader("📥 Descarga de Reportes PDF")
 
             # Usar session_state para mantener el estado de los PDFs generados
@@ -493,6 +466,58 @@ if analyze_button:
 
                 st.markdown("---")
 
+                # === REPORTES POR NIVEL ACADÉMICO ===
+                st.markdown("**🎯 Reportes por Nivel Académico:**")
+
+                # Selector de nivel
+                selected_levels = st.multiselect(
+                    "Seleccionar Niveles Académicos:",
+                    options=['2', '4', '6', '8'],
+                    default=['2', '4', '6', '8'],
+                    help="Selecciona uno o varios niveles para generar PDFs específicos"
+                )
+
+                # Mostrar botones de descarga por nivel seleccionado
+                if selected_levels:
+                    cols_levels = st.columns(len(selected_levels))
+
+                    for i, level in enumerate(selected_levels):
+                        with cols_levels[i]:
+                            st.download_button(
+                                label=f"🎯 Nivel {level}",
+                                data=st.session_state.pdf_cache[cache_key].get(f'level_{level}', b''),
+                                file_name=f"Andru_Nivel{level}_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                mime="application/pdf",
+                                help=f"Análisis completo filtrado para nivel académico {level}",
+                                key=f"dl_pdf_level{level}_cached"
+                            )
+
+                # === INFORMACIÓN SOBRE LOS REPORTES ===
+                with st.expander("ℹ️ Información sobre los Reportes PDF"):
+                    st.markdown("""
+                    ### 📊 **PDF Ejecutivo** (Vertical)
+                    - **Columnas**: RdA, Nivel Bloom, Observable, Medible, Evaluable, Corrección
+                    - **Uso**: Resumen gerencial rápido y presentaciones ejecutivas
+                    - **Formato**: A4 vertical, tabla compacta
+
+                    ### 📋 **PDF Completo** (Horizontal)
+                    - **Columnas**: 15 columnas completas con toda la información
+                    - **Incluye**: Verbo, Adecuación, Autenticidad, Conocimiento, etc.
+                    - **Formato**: A4 horizontal para máximo aprovechamiento del espacio
+                    - **Uso**: Análisis detallado y documentación completa
+
+                    ### 📈 **PDF Solo Gráficos** (Horizontal)
+                    - **Contenido**: 5 páginas con SOLO visualizaciones (sin tablas)
+                    - **Gráficos**: Distribuciones, Verificabilidad, Autenticidad, Conocimiento, Comparación
+                    - **Formato**: A4 horizontal, gráficos de alta calidad
+                    - **Uso**: Presentaciones visuales y análisis estadístico
+
+                    ### 🎯 **PDFs por Nivel**
+                    - **Contenido**: Tabla completa filtrada por nivel académico específico
+                    - **Formato**: A4 horizontal con 15 columnas
+                    - **Uso**: Análisis específico por nivel de formación
+                    """)
+
             # --- Fin Descarga Consolidada Mejorada ---
             st.subheader("Resumen General")
 
@@ -557,60 +582,6 @@ if analyze_button:
                     key='download_summary'
                 )
 
-                # --- Botones PDF para Resumen General ---
-                st.markdown("#### 🤖 **Exportación PDF - Resumen General**")
-
-                col_summary_pdf1, col_summary_pdf2 = st.columns(2)
-
-                with col_summary_pdf1:
-                    try:
-                        # Corregir: usar directamente st.download_button sin st.button
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
-
-                        pdf_data = generate_executive_pdf(results_df.to_dict('records'), global_academic_level, {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0
-                        })
-                        st.download_button(
-                            label="📊 PDF Resumen Ejecutivo",
-                            data=pdf_data,
-                            file_name=f"Andru_Resumen_Ejecutivo_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            help="Resumen general con métricas agregadas",
-                            key="dl_summary_pdf_executive"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar PDF resumen ejecutivo: {str(e)}")
-
-                with col_summary_pdf2:
-                    try:
-                        # Corregir: usar directamente st.download_button sin st.button
-                        bloom_distribution = {}
-                        if 'Nivel Bloom Detectado' in results_df.columns:
-                            bloom_distribution = results_df['Nivel Bloom Detectado'].value_counts().to_dict()
-
-                        # CORREGIDO: Usar generate_charts_pdf en lugar de generate_complete_pdf
-                        pdf_data = generate_charts_pdf(results_df.to_dict('records'), global_academic_level, {
-                            'total_rdas': len(results_df),
-                            'bloom_distribution': bloom_distribution,
-                            'avg_bloom_score': 0
-                        })
-                        st.download_button(
-                            label="📈 PDF con Gráficos",
-                            data=pdf_data,
-                            file_name=f"Andru_PDF_Graficos_{pd.Timestamp.now().strftime('%Y%m%d_%H%M')}.pdf",
-                            mime="application/pdf",
-                            help="Reporte con gráficos, visualizaciones y análisis estadístico",
-                            key="dl_summary_pdf_charts"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar PDF con gráficos: {str(e)}")
-            # --- Fin Descarga Consolidada ---
-
-
             # --- Mostrar Resúmenes en Columnas ---
             # <<< MODIFICADO >>> Usar 6 columnas para incluir Conocimiento
             col1, col2, col3, col4, col5, col6 = st.columns(6)
@@ -659,7 +630,7 @@ if analyze_button:
                     avg_corr = results_df["Puntaje Corrección"].mean().round(2)
                     corr_freq = results_df["Puntaje Corrección"].value_counts().sort_index().reset_index()
                     corr_freq.columns = ['Puntaje', 'Frecuencia']
-                    st.metric(label="Promedio Corrección (0-3)", value=f"{avg_corr:.2f}")
+                    st.metric(label="Promedio Corrección (0-2)", value=f"{avg_corr:.2f}")
                     st.markdown("Frecuencia Puntajes:")
                     st.dataframe(corr_freq, use_container_width=True, hide_index=True)
 
@@ -764,6 +735,6 @@ if analyze_button:
 
 # --- Sección de Información Adicional ---
 st.markdown("##### Desarrollado por Ruben Tocain G.")
-st.caption("## Como parte del Proyecto de Investigación RdA's- v0.1 y Caso Práctico de Titulación")
-st.sidebar.info("Herramienta desarrollada para asistir en el análisis curricular.")
+st.caption("## Como parte del Proyecto de Investigación RdA's- v2.0")
+st.sidebar.info("Herramienta desarrollada por Andru.ia para asistir en el análisis curricular.")
 # st.caption("Versión 1.2.0 - Integración Incremental y Selección de Columna")
